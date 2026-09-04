@@ -1,111 +1,149 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 40%, #f3f4f6 70%, #faf8ff 100%);
+    color: #1e243a;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    overscroll-behavior: none;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+/* Small Gray Dots Background Pattern (Behind Cards) */
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.45) 1.25px, transparent 1.25px);
+  background-size: 22px 22px;
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
+::-webkit-scrollbar {
+  display: none;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* Premium Light Glassmorphism Design System Tokens */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-hover: rgba(255, 255, 255, 0.88);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.85);
+  --glass-border-hover: 1px solid rgba(255, 255, 255, 0.98);
+  --glass-blur: blur(16px) saturate(180%);
+  --glass-shadow: 0 12px 32px -4px rgba(31, 38, 135, 0.07), 0 4px 12px rgba(31, 38, 135, 0.03), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+  --glass-shadow-hover: 0 16px 40px -4px rgba(31, 38, 135, 0.10), 0 6px 16px rgba(31, 38, 135, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 1);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+.clay-card, aside.clay-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 24px !important;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.clay-card:hover {
+  background: var(--glass-bg-hover) !important;
+  box-shadow: var(--glass-shadow-hover) !important;
+}
+
+.clay-card-sm {
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(14px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 8px 24px -3px rgba(31, 38, 135, 0.06), inset 0 1px 1px #ffffff !important;
+  border-radius: 20px !important;
+}
+
+.clay-pill {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 4px 14px -2px rgba(31, 38, 135, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
+  border-radius: 9999px !important;
+  transition: all 0.2s ease !important;
+}
+
+.clay-pill:hover {
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 6px 18px -2px rgba(31, 38, 135, 0.08), inset 0 1px 1px #ffffff !important;
+}
+
+.clay-button {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 4px 12px -2px rgba(31, 38, 135, 0.06), inset 0 1px 1px #ffffff !important;
+  transition: all 0.2s ease !important;
+}
+
+.clay-button:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 6px 16px -2px rgba(31, 38, 135, 0.09) !important;
+}
+
+/* Equal Box & Block Spacing Rules */
+.overview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem !important; /* 24px equal vertical gap between major sections */
+}
+
+.overview-grid {
+  display: grid;
+  gap: 1.5rem !important; /* 24px equal gap horizontally and vertically between grid boxes */
+}
+
+.overview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem !important; /* 24px equal vertical gap between stacked boxes */
+}
+
+/* Keyframe Animations */
+@keyframes ani {
+  0% {
+    transform: translateX(0%) scale(1);
+  }
+  50% {
+    transform: translateX(-100%) scale(0.8);
+  }
+  100% {
+    transform: translateX(0%) scale(1);
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+@keyframes shine {
+  0% {
+    top: 100%;
+    left: -100%;
+  }
+  50%,
+  100% {
+    top: 0%;
+    left: 70%;
   }
 }
-p {
-  margin: 0;
-}
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
 }
