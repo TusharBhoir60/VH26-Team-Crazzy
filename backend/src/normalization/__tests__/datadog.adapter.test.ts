@@ -52,7 +52,7 @@ describe('DatadogAdapter', () => {
     expect(res?.alert.alertname).toBe('High CPU');
     expect(res?.alert.service).toBe('cache-service');
     expect(res?.alert.status).toBe('firing');
-    expect(res?.alert.severity_score).toBe('medium');
+    expect(res?.alert.severity_score).toBe('warning');
     expect(res?.alert.labels['env']).toBe('production');
   });
 

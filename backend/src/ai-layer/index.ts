@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { logger } from '../shared/logger';
 import { AiEnrichmentResult } from './types';
-import { Incident } from '../safety-gate/types';
+import { Incident } from '../types/alert.types';
 import { buildIncidentPrompt } from './prompt';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -13,7 +13,7 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile';
  */
 const AiEnrichmentResultSchema = z.object({
   rootCauseSuggestion: z.string().min(1),
-  suggestedSeverity: z.enum(['critical', 'high', 'medium', 'low']),
+  suggestedSeverity: z.enum(['critical', 'warning', 'info', 'unknown']),
   narrative: z.string().min(1),
 });
 
@@ -38,7 +38,7 @@ export async function getAiEnrichment(
 
   if (!apiKey) {
     logger.warn(
-      { cluster_id: incident.cluster_id },
+      { incident_id: incident.incident_id },
       'ai-layer: GROQ_API_KEY not set — skipping AI enrichment'
     );
     return null;
@@ -75,7 +75,7 @@ export async function getAiEnrichment(
 
     if (!response.ok) {
       logger.warn(
-        { cluster_id: incident.cluster_id, status: response.status },
+        { incident_id: incident.incident_id, status: response.status },
         'ai-layer: Groq API returned non-OK response — treating as unavailable'
       );
       return null;
@@ -88,7 +88,7 @@ export async function getAiEnrichment(
 
     if (!contentStr) {
       logger.warn(
-        { cluster_id: incident.cluster_id },
+        { incident_id: incident.incident_id },
         'ai-layer: Groq response missing content field — treating as unavailable'
       );
       return null;
@@ -100,7 +100,7 @@ export async function getAiEnrichment(
       parsed = JSON.parse(contentStr);
     } catch {
       logger.warn(
-        { cluster_id: incident.cluster_id },
+        { incident_id: incident.incident_id },
         'ai-layer: Failed to parse Groq response as JSON — treating as unavailable'
       );
       return null;
@@ -110,7 +110,7 @@ export async function getAiEnrichment(
     const result = AiEnrichmentResultSchema.safeParse(parsed);
     if (!result.success) {
       logger.warn(
-        { cluster_id: incident.cluster_id, issues: result.error.issues },
+        { incident_id: incident.incident_id, issues: result.error.issues },
         'ai-layer: Groq response failed schema validation — treating as unavailable'
       );
       return null;
@@ -118,7 +118,7 @@ export async function getAiEnrichment(
 
     logger.info(
       {
-        cluster_id: incident.cluster_id,
+        incident_id: incident.incident_id,
         suggestedSeverity: result.data.suggestedSeverity,
       },
       'ai-layer: Successfully received and validated AI enrichment'
@@ -132,7 +132,7 @@ export async function getAiEnrichment(
 
     logger.warn(
       {
-        cluster_id: incident.cluster_id,
+        incident_id: incident.incident_id,
         event: isTimeout ? 'ai-layer.timeout' : 'ai-layer.error',
         timeoutMs,
         err: isTimeout ? undefined : err,

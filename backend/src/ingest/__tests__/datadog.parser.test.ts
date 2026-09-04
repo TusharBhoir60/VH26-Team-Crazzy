@@ -50,7 +50,7 @@ describe('Datadog Parser & Normalizer', () => {
       expect(alert?.alertname).toBe('High CPU');
       expect(alert?.service).toBe('cache-service');
       expect(alert?.status).toBe('firing');
-      expect(alert?.severity_score).toBe('medium');
+      expect(alert?.severity_score).toBe('warning');
     }
   });
 
@@ -72,11 +72,11 @@ describe('Datadog Parser & Normalizer', () => {
 
   it('should map Datadog priorities and alert types correctly', () => {
     expect(mapDatadogSeverity({ title: 't', priority: 'P1' }, {})).toBe('critical');
-    expect(mapDatadogSeverity({ title: 't', priority: 'P2' }, {})).toBe('high');
-    expect(mapDatadogSeverity({ title: 't', priority: 'P3' }, {})).toBe('medium');
-    expect(mapDatadogSeverity({ title: 't', priority: 'P4' }, {})).toBe('low');
+    expect(mapDatadogSeverity({ title: 't', priority: 'P2' }, {})).toBe('warning');
+    expect(mapDatadogSeverity({ title: 't', priority: 'P3' }, {})).toBe('warning');
+    expect(mapDatadogSeverity({ title: 't', priority: 'P4' }, {})).toBe('info');
     expect(mapDatadogSeverity({ title: 't', alert_type: 'error' }, {})).toBe('critical');
-    expect(mapDatadogSeverity({ title: 't', alert_type: 'warning' }, {})).toBe('medium');
-    expect(mapDatadogSeverity({ title: 't', alert_type: 'info' }, {})).toBe('low');
+    expect(mapDatadogSeverity({ title: 't', alert_type: 'warning' }, {})).toBe('warning');
+    expect(mapDatadogSeverity({ title: 't', alert_type: 'info' }, {})).toBe('info');
   });
 });

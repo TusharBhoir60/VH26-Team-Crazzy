@@ -12,77 +12,49 @@ describe('validateEnrichment — Safety Gate Rules 1 & 2', () => {
   describe('passing cases (equal or escalation)', () => {
     it('should pass when AI severity equals deterministic severity', () => {
       expect(validateEnrichment('critical', makeAiResult('critical'))).toEqual({ passed: true });
-      expect(validateEnrichment('high', makeAiResult('high'))).toEqual({ passed: true });
-      expect(validateEnrichment('medium', makeAiResult('medium'))).toEqual({ passed: true });
-      expect(validateEnrichment('low', makeAiResult('low'))).toEqual({ passed: true });
+      expect(validateEnrichment('warning', makeAiResult('warning'))).toEqual({ passed: true });
+      expect(validateEnrichment('info', makeAiResult('info'))).toEqual({ passed: true });
     });
 
-    it('should pass when AI escalates low → medium', () => {
-      expect(validateEnrichment('low', makeAiResult('medium'))).toEqual({ passed: true });
+    it('should pass when AI escalates info → warning', () => {
+      expect(validateEnrichment('info', makeAiResult('warning'))).toEqual({ passed: true });
     });
 
-    it('should pass when AI escalates low → high', () => {
-      expect(validateEnrichment('low', makeAiResult('high'))).toEqual({ passed: true });
+    it('should pass when AI escalates info → critical', () => {
+      expect(validateEnrichment('info', makeAiResult('critical'))).toEqual({ passed: true });
     });
 
-    it('should pass when AI escalates low → critical', () => {
-      expect(validateEnrichment('low', makeAiResult('critical'))).toEqual({ passed: true });
-    });
-
-    it('should pass when AI escalates medium → high', () => {
-      expect(validateEnrichment('medium', makeAiResult('high'))).toEqual({ passed: true });
-    });
-
-    it('should pass when AI escalates medium → critical', () => {
-      expect(validateEnrichment('medium', makeAiResult('critical'))).toEqual({ passed: true });
-    });
-
-    it('should pass when AI escalates high → critical', () => {
-      expect(validateEnrichment('high', makeAiResult('critical'))).toEqual({ passed: true });
+    it('should pass when AI escalates warning → critical', () => {
+      expect(validateEnrichment('warning', makeAiResult('critical'))).toEqual({ passed: true });
     });
   });
 
   describe('failing cases (downgrade — rule violation)', () => {
-    it('should fail when AI downgrades critical → high (rule 1: critical never downgraded)', () => {
-      const result = validateEnrichment('critical', makeAiResult('high'));
+    it('should fail when AI downgrades critical → warning (rule 1: critical never downgraded)', () => {
+      const result = validateEnrichment('critical', makeAiResult('warning'));
       expect(result.passed).toBe(false);
       if (!result.passed) {
         expect(result.reason).toContain('critical');
-        expect(result.reason).toContain('high');
+        expect(result.reason).toContain('warning');
       }
     });
 
-    it('should fail when AI downgrades critical → medium', () => {
-      const result = validateEnrichment('critical', makeAiResult('medium'));
+    it('should fail when AI downgrades critical → info', () => {
+      const result = validateEnrichment('critical', makeAiResult('info'));
       expect(result.passed).toBe(false);
     });
 
-    it('should fail when AI downgrades critical → low', () => {
-      const result = validateEnrichment('critical', makeAiResult('low'));
-      expect(result.passed).toBe(false);
-    });
-
-    it('should fail when AI downgrades high → medium (rule 2: never de-escalate)', () => {
-      const result = validateEnrichment('high', makeAiResult('medium'));
-      expect(result.passed).toBe(false);
-    });
-
-    it('should fail when AI downgrades high → low', () => {
-      const result = validateEnrichment('high', makeAiResult('low'));
-      expect(result.passed).toBe(false);
-    });
-
-    it('should fail when AI downgrades medium → low', () => {
-      const result = validateEnrichment('medium', makeAiResult('low'));
+    it('should fail when AI downgrades warning → info (rule 2: never de-escalate)', () => {
+      const result = validateEnrichment('warning', makeAiResult('info'));
       expect(result.passed).toBe(false);
     });
   });
 
   describe('SEVERITY_RANK ordering', () => {
-    it('should have correct rank ordering: low < medium < high < critical', () => {
-      expect(SEVERITY_RANK.low).toBeLessThan(SEVERITY_RANK.medium);
-      expect(SEVERITY_RANK.medium).toBeLessThan(SEVERITY_RANK.high);
-      expect(SEVERITY_RANK.high).toBeLessThan(SEVERITY_RANK.critical);
+    it('should have correct rank ordering: unknown < info < warning < critical', () => {
+      expect(SEVERITY_RANK.unknown).toBeLessThan(SEVERITY_RANK.info);
+      expect(SEVERITY_RANK.info).toBeLessThan(SEVERITY_RANK.warning);
+      expect(SEVERITY_RANK.warning).toBeLessThan(SEVERITY_RANK.critical);
     });
   });
 });

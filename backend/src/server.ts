@@ -4,8 +4,13 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { ingestRouter } from './ingest/ingest.router';
 import { logger } from './shared/logger';
+import { bootstrapPipeline } from './bootstrap';
+import { dashboardRouter } from './dashboard-api/router';
 
 dotenv.config();
+
+// Initialize the pipeline components
+bootstrapPipeline();
 
 export const app: Express = express();
 

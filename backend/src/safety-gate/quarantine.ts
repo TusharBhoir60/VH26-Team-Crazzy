@@ -20,8 +20,8 @@ export async function pushToQuarantine(
   const client = getRedisClient();
 
   const entry = {
-    cluster_id: incident.cluster_id,
-    fingerprint: incident.root_cause?.alert ?? 'unknown',
+    incident_id: incident.incident_id,
+    fingerprint: incident.root_cause?.fingerprint ?? 'unknown',
     deterministicSeverity: detail.deterministicSeverity,
     aiSuggestedSeverity: detail.aiSuggestedSeverity,
     detectedAt: detail.detectedAt,
@@ -39,7 +39,7 @@ export async function pushToQuarantine(
     logger.error(
       {
         event: 'safety-gate.violation_quarantined',
-        cluster_id: incident.cluster_id,
+        incident_id: incident.incident_id,
         deterministicSeverity: detail.deterministicSeverity,
         aiSuggestedSeverity: detail.aiSuggestedSeverity,
         narrative: detail.aiResponse.narrative,
@@ -52,7 +52,7 @@ export async function pushToQuarantine(
     logger.error(
       {
         event: 'safety-gate.quarantine_push_failed',
-        cluster_id: incident.cluster_id,
+        incident_id: incident.incident_id,
         err,
       },
       'Safety Gate: Failed to push quarantined incident to Redis — incident lost from quarantine queue!'

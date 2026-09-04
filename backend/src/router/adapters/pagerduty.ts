@@ -1,0 +1,58 @@
+import axios from 'axios';
+import { Incident, BatchedGroup } from '../../types/alert.types';
+import { ChannelAdapter, DeliveryResult } from '../types';
+
+export class PagerDutyAdapter implements ChannelAdapter {
+  private routingKey: string;
+  private endpoint = 'https://events.pagerduty.com/v2/enqueue';
+
+  constructor(routingKey?: string) {
+    this.routingKey = routingKey || process.env.PAGERDUTY_ROUTING_KEY || '';
+  }
+
+  async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
+    if (!this.routingKey) {
+      return { success: false, error: 'PAGERDUTY_ROUTING_KEY is not configured', retryable: false };
+    }
+
+    try {
+      const response = await axios.post(
+        this.endpoint,
+        {
+          routing_key: this.routingKey,
+          event_action: 'trigger',
+          payload: {
+            summary: content,
+            source: 'Antigravity Router',
+            severity: 'critical',
+          }
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 10000,
+        }
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        return { success: true, messageId: response.data?.dedup_key };
+      }
+
+      return {
+        success: false,
+        error: `Unexpected status code ${response.status}`,
+        retryable: response.status >= 500 || response.status === 429,
+      };
+    } catch (err: any) {
+      if (err.response) {
+        return {
+          success: false,
+          error: `HTTP ${err.response.status}: ${JSON.stringify(err.response.data)}`,
+          retryable: err.response.status >= 500 || err.response.status === 429,
+        };
+      }
+      return { success: false, error: err.message, retryable: true };
+    }
+  }
+}
