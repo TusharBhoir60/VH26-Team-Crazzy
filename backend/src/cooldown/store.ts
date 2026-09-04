@@ -1,6 +1,4 @@
-import Redis from 'ioredis';
-
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+import { getRedisClient } from '../shared/redis.client';
 
 /**
  * Checks if the fingerprint is in a cooldown window.
@@ -12,6 +10,7 @@ export async function checkAndApplyCooldown(
   fingerprint: string,
   cooldownMs: number
 ): Promise<{ allowed: boolean; suppressedCount: number }> {
+  const redis = getRedisClient();
   const cooldownKey = `cooldown:${fingerprint}`;
   const countKey = `cooldown:${fingerprint}:suppressed_count`;
 
@@ -45,5 +44,6 @@ export async function checkAndApplyCooldown(
 
 // Exported for testing purposes
 export function closeRedisConnection() {
+  const redis = getRedisClient();
   return redis.quit();
 }
