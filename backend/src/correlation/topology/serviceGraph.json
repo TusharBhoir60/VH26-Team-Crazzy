@@ -1,0 +1,26 @@
+{
+  "database-primary": {
+    "service": "database-primary",
+    "depends_on": []
+  },
+  "payments-service": {
+    "service": "payments-service",
+    "depends_on": ["database-primary"]
+  },
+  "checkout-service": {
+    "service": "checkout-service",
+    "depends_on": ["database-primary", "payments-service"]
+  },
+  "frontend": {
+    "service": "frontend",
+    "depends_on": ["checkout-service"]
+  },
+  "auth-service": {
+    "service": "auth-service",
+    "depends_on": ["database-primary"]
+  },
+  "api-gateway": {
+    "service": "api-gateway",
+    "depends_on": ["auth-service", "checkout-service"]
+  }
+}
