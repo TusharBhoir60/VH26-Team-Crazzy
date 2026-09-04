@@ -4,9 +4,99 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Alert Fatigue Buster | Sentry AIOps Noise Shield</title>
+
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#002114",
+              "surface-container": "#ebedfe",
+              "tertiary": "#059669",
+              "surface-bright": "#faf8ff",
+              "error-container": "#fee2e2",
+              "outline-variant": "#e2e6f3",
+              "secondary": "#3b82f6",
+              "on-tertiary": "#ffffff",
+              "on-primary-fixed-variant": "#3742be",
+              "inverse-on-surface": "#eff0ff",
+              "background": "#edeef8",
+              "on-surface": "#1e243a",
+              "secondary-container": "#dbeafe",
+              "error": "#ef4444",
+              "primary-fixed-dim": "#c7d2fe",
+              "outline": "#8d96b0",
+              "on-secondary-fixed-variant": "#1e40af",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#ffffff",
+              "tertiary-fixed-dim": "#a7f3d0",
+              "primary": "#5c67f5",
+              "on-error-container": "#991b1b",
+              "surface-container-highest": "#e4e8f7",
+              "surface-container-low": "#f6f7fd",
+              "surface-container-high": "#eef1fb",
+              "inverse-surface": "#2d303d",
+              "surface": "#f0f2fa",
+              "on-secondary-fixed": "#172554",
+              "inverse-primary": "#bcc2ff",
+              "on-tertiary-fixed-variant": "#047857",
+              "surface-tint": "#5c67f5",
+              "surface-dim": "#d7d9ea",
+              "secondary-fixed": "#e0edff",
+              "on-tertiary-container": "#064e3b",
+              "on-primary": "#ffffff",
+              "secondary-fixed-dim": "#bfdbfe",
+              "on-surface-variant": "#64708d",
+              "on-primary-fixed": "#1e1b4b",
+              "on-error": "#ffffff",
+              "tertiary-container": "#d1fae5",
+              "surface-variant": "#e6e9f5",
+              "on-background": "#1e243a",
+              "primary-container": "#5c67f5",
+              "on-secondary-container": "#1e3a8a",
+              "tertiary-fixed": "#d1fae5",
+              "primary-fixed": "#e0e5ff",
+              "surface-container-lowest": "#ffffff"
+            },
+            borderRadius: {
+              DEFAULT: "0.375rem",
+              lg: "0.75rem",
+              xl: "1rem",
+              "2xl": "1.5rem",
+              "3xl": "1.75rem",
+              full: "9999px"
+            },
+            fontFamily: {
+              "label-sm": ["Inter", "sans-serif"],
+              "display-lg": ["Manrope", "sans-serif"],
+              "headline-lg": ["Manrope", "sans-serif"],
+              "headline-md": ["Manrope", "sans-serif"],
+              "title-lg": ["Manrope", "sans-serif"],
+              "title-md": ["Inter", "sans-serif"],
+              "headline-lg-mobile": ["Manrope", "sans-serif"],
+              "body-md": ["Inter", "sans-serif"],
+              "headline-sm": ["Manrope", "sans-serif"],
+              "body-sm": ["Inter", "sans-serif"],
+              "mono-metric": ["JetBrains Mono", "monospace"],
+              "label-md": ["Inter", "sans-serif"],
+              "body-lg": ["Inter", "sans-serif"]
+            }
+          }
+        }
+      };
+    </script>
   </head>
-  <body>
+  <body class="font-body-md text-on-surface relative min-h-screen selection:bg-primary/20 selection:text-primary" style="background: linear-gradient(135deg, #edeef8 0%, #e6e9f8 40%, #e9ecfa 70%, #edf0fb 100%);">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
