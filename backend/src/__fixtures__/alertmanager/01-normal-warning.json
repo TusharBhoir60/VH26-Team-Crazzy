@@ -1,0 +1,33 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "HighMemoryUsage",
+        "severity": "warning",
+        "service": "cache-service",
+        "env": "production"
+      },
+      "annotations": {
+        "summary": "HighMemoryUsage on cache-service",
+        "description": "Description for HighMemoryUsage"
+      },
+      "startsAt": "2026-09-04T21:23:45.529Z",
+      "generatorURL": "http://prometheus:9090",
+      "fingerprint": "am-norm-warn-001"
+    }
+  ],
+  "groupLabels": {
+    "env": "production"
+  },
+  "commonLabels": {
+    "env": "production"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "{}:{env=\"production\"}",
+  "truncatedAlerts": 0
+}

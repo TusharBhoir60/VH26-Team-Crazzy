@@ -1,0 +1,11 @@
+{
+  "title": "[Triggered] CPU Throttling",
+  "body": "Description for [Triggered] CPU Throttling",
+  "alert_type": "error",
+  "priority": "P2",
+  "alert_transition": "Triggered",
+  "tags": "env:production,service:api-gateway,severity:high",
+  "date": 1788557025,
+  "id": 363480,
+  "hostname": "prod-server-01"
+}

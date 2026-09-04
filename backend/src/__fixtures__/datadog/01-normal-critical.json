@@ -1,0 +1,11 @@
+{
+  "title": "[Triggered] Database Down",
+  "body": "Description for [Triggered] Database Down",
+  "alert_type": "error",
+  "priority": "P1",
+  "alert_transition": "Triggered",
+  "tags": "env:production,service:primary-db,severity:critical",
+  "date": 1788557025,
+  "id": 437515,
+  "hostname": "prod-server-01"
+}

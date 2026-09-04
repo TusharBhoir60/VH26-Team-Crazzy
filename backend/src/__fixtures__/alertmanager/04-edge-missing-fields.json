@@ -1,0 +1,10 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {}
+    }
+  ]
+}
