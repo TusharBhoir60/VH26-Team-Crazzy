@@ -30,7 +30,7 @@ export function mapAlertmanagerSeverity(severityRaw?: string): Severity | null {
     case 'p2':
     case 'sev2':
     case 'sev-2':
-      return 'high';
+      return 'warning';
 
     case 'medium':
     case 'med':
@@ -40,7 +40,7 @@ export function mapAlertmanagerSeverity(severityRaw?: string): Severity | null {
     case 'p3':
     case 'sev3':
     case 'sev-3':
-      return 'medium';
+      return 'warning';
 
     case 'low':
     case 'info':
@@ -52,7 +52,7 @@ export function mapAlertmanagerSeverity(severityRaw?: string): Severity | null {
     case 'p5':
     case 'sev4':
     case 'sev-4':
-      return 'low';
+      return 'info';
 
     default:
       return null;

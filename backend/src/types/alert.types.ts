@@ -1,4 +1,4 @@
-export type Severity = 'critical' | 'high' | 'medium' | 'low';
+export type Severity = 'critical' | 'warning' | 'info' | 'unknown';
 export type AlertStatus = 'firing' | 'flapping' | 'resolved';
 export type Source = 'prometheus' | 'datadog';
 export type Confidence = 'high' | 'medium' | 'low';

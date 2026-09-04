@@ -29,7 +29,7 @@ describe('NormalizationRegistry', () => {
               source: 'prometheus', // maps to internal source
               raw_payload: payload as unknown as Record<string, unknown>,
               received_at: new Date().toISOString(),
-              severity_score: 'high',
+              severity_score: 'warning',
               cluster_id: null,
               is_root_cause: false,
             },
@@ -44,7 +44,7 @@ describe('NormalizationRegistry', () => {
     const res = await normalize('grafana', { title: 'High Memory', state: 'alerting' });
     expect(res).toHaveLength(1);
     expect(res[0]?.alert.alertname).toBe('High Memory');
-    expect(res[0]?.alert.severity_score).toBe('high');
+    expect(res[0]?.alert.severity_score).toBe('warning');
 
     const resAlias = await normalize('grafana-webhook', { title: 'High CPU', state: 'ok' });
     expect(resAlias).toHaveLength(1);
