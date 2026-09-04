@@ -20,7 +20,7 @@ export const startBatchScheduler = (onFlush: FlushCallback): void => {
         await onFlush(groups);
       }
     } catch (error) {
-      logger.error('[Batching] Error during batch flush:', error);
+      logger.error({ err: error }, '[Batching] Error during batch flush');
     }
   }, BATCH_WINDOW_MS);
   

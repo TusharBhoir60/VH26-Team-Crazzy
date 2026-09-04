@@ -10,7 +10,7 @@ export type BatchingHandler = (incident: Incident) => Promise<void>;
 let downstreamBatchingHandler: BatchingHandler = async (incident: Incident): Promise<void> => {
   logger.info(
     {
-      cluster_id: incident.cluster_id,
+      incident_id: incident.incident_id,
       severity: incident.severity,
       aiEnrichment: incident.aiEnrichment
         ? { suggestedSeverity: incident.aiEnrichment.suggestedSeverity }
@@ -109,7 +109,7 @@ export async function applySafetyGate(incident: Incident): Promise<SafetyGateRes
     logger.warn(
       {
         event: 'safety-gate.ai_escalation',
-        cluster_id: incident.cluster_id,
+        incident_id: incident.incident_id,
         deterministicSeverity: incident.severity,
         escalatedSeverity: aiResult.suggestedSeverity,
       },
@@ -131,7 +131,7 @@ async function forwardToBatching(incident: Incident): Promise<void> {
     await downstreamBatchingHandler(incident);
   } catch (err) {
     logger.error(
-      { cluster_id: incident.cluster_id, err },
+      { incident_id: incident.incident_id, err },
       'Safety Gate: Error in Batching handler — incident may not have been batched'
     );
   }

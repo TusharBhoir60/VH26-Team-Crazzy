@@ -124,25 +124,25 @@ describe('DedupEngine & Deduplication Logic', () => {
     const resCrit = await dedupEngine.dedupe(critAlert);
     expect(resCrit.ttlSeconds).toBe(60);
 
-    // High -> 300s
-    const highAlert = createSampleAlert({ fingerprint: 'fp-high', severity_score: 'high' });
-    const resHigh = await dedupEngine.dedupe(highAlert);
-    expect(resHigh.ttlSeconds).toBe(300);
+    // Warning -> 300s
+    const warnAlert = createSampleAlert({ fingerprint: 'fp-warn', severity_score: 'warning' });
+    const resWarn = await dedupEngine.dedupe(warnAlert);
+    expect(resWarn.ttlSeconds).toBe(300);
 
-    // Medium -> 900s
-    const medAlert = createSampleAlert({ fingerprint: 'fp-med', severity_score: 'medium' });
-    const resMed = await dedupEngine.dedupe(medAlert);
-    expect(resMed.ttlSeconds).toBe(900);
+    // Info -> 900s
+    const infoAlert = createSampleAlert({ fingerprint: 'fp-info', severity_score: 'info' });
+    const resInfo = await dedupEngine.dedupe(infoAlert);
+    expect(resInfo.ttlSeconds).toBe(900);
 
-    // Low -> 1800s
-    const lowAlert = createSampleAlert({ fingerprint: 'fp-low', severity_score: 'low' });
-    const resLow = await dedupEngine.dedupe(lowAlert);
-    expect(resLow.ttlSeconds).toBe(1800);
+    // Unknown -> 300s (default)
+    const unkAlert = createSampleAlert({ fingerprint: 'fp-unk', severity_score: 'unknown' });
+    const resUnk = await dedupEngine.dedupe(unkAlert);
+    expect(resUnk.ttlSeconds).toBe(300);
   });
 
   it('should re-scale TTL when duplicate escalates severity mid-window', async () => {
-    const alertMed = createSampleAlert({ fingerprint: 'fp-escalate', severity_score: 'medium' });
-    const res1 = await dedupEngine.dedupe(alertMed);
+    const alertInfo = createSampleAlert({ fingerprint: 'fp-escalate', severity_score: 'info' });
+    const res1 = await dedupEngine.dedupe(alertInfo);
     expect(res1.ttlSeconds).toBe(900);
 
     // Duplicate arrives escalated to critical

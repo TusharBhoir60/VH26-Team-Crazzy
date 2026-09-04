@@ -6,9 +6,9 @@ import { AiEnrichmentResult } from '../ai-layer/types';
  * Used to compare deterministic vs AI-suggested severity levels.
  */
 const SEVERITY_RANK: Record<Severity, number> = {
-  low: 0,
-  medium: 1,
-  high: 2,
+  unknown: 0,
+  info: 1,
+  warning: 2,
   critical: 3,
 } as const;
 

@@ -5,7 +5,7 @@ import { Alert } from '../types/alert.types';
 // Use a shared Redis instance or create a new one based on env
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
-const INCIDENT_TTL_SECONDS = 5 * 60; // 5 minutes correlation window
+import { INCIDENT_TTL_SECONDS } from './config';
 const INCIDENT_PREFIX = 'incident:';
 
 export async function getActiveIncidentByServices(services: string[]): Promise<Incident | null> {

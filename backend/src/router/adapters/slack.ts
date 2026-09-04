@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Alert, BatchedGroup } from '../../types/alert.types';
+import { Incident, BatchedGroup } from '../../types/alert.types';
 import { ChannelAdapter, DeliveryResult } from '../types';
 
 export class SlackAdapter implements ChannelAdapter {
@@ -9,7 +9,7 @@ export class SlackAdapter implements ChannelAdapter {
     this.webhookUrl = webhookUrl || process.env.SLACK_WEBHOOK_URL || '';
   }
 
-  async send(content: string, incident: Alert | BatchedGroup): Promise<DeliveryResult> {
+  async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
     if (!this.webhookUrl) {
       return { success: false, error: 'SLACK_WEBHOOK_URL is not configured', retryable: false };
     }

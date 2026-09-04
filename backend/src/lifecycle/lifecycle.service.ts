@@ -4,10 +4,7 @@ import { LifecycleHistory, LifecycleResult } from './types';
 import { evaluateState } from './stateMachine';
 import { logger } from '../shared/logger';
 
-// Default TTL: 1 hour for active or flapping alerts
-const LIFECYCLE_TTL_SECONDS = 60 * 60;
-// Grace period TTL: 5 minutes after resolution to allow downstream processing to finish
-const RESOLVED_TTL_SECONDS = 5 * 60;
+import { LIFECYCLE_TTL_SECONDS, RESOLVED_TTL_SECONDS } from './config';
 
 /**
  * Stage 3: Lifecycle Tracking

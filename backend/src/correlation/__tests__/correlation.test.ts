@@ -15,7 +15,7 @@ const createMockAlert = (service: string, fingerprint: string = '123'): Alert =>
   source: 'prometheus',
   raw_payload: {},
   received_at: new Date().toISOString(),
-  severity_score: 'high',
+  severity_score: 'warning',
   cluster_id: null,
   is_root_cause: false,
 });
@@ -48,7 +48,7 @@ describe('Correlation Module', () => {
       incident_id: 'test-incident-1',
       root_cause: existingAlert,
       alerts: [existingAlert],
-      severity: 'high',
+      severity: 'warning',
       summary: 'test',
       created_at: new Date().toISOString()
     };
@@ -69,7 +69,7 @@ describe('Correlation Module', () => {
       incident_id: 'test-incident-1',
       root_cause: existingAlert,
       alerts: [existingAlert],
-      severity: 'high',
+      severity: 'warning',
       summary: 'test',
       created_at: new Date().toISOString()
     };
