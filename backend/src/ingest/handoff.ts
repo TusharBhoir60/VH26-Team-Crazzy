@@ -2,12 +2,11 @@ import { Alert } from '../types/alert.types';
 import { dedupe } from '../dedup';
 import { logger } from '../shared/logger';
 
-export type AlertHandler = (alert: Alert) => Promise<Alert | void>;
+export type AlertHandler = (alert: Alert) => Promise<any>;
 
 // Connects Ingest directly to Dedup by default
-let downstreamHandler: AlertHandler = async (alert: Alert): Promise<Alert> => {
-  await dedupe(alert);
-  return alert;
+let downstreamHandler: AlertHandler = async (alert: Alert) => {
+  return await dedupe(alert);
 };
 
 /**
@@ -20,7 +19,7 @@ export function setDownstreamHandler(handler: AlertHandler): void {
 /**
  * Dispatches a normalized alert to the downstream pipeline (Dedup).
  */
-export async function handleNormalizedAlert(alert: Alert): Promise<Alert | void> {
+export async function handleNormalizedAlert(alert: Alert): Promise<any> {
   try {
     return await downstreamHandler(alert);
   } catch (error) {

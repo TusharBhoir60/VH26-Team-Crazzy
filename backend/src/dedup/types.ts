@@ -11,7 +11,7 @@ export interface DedupResult {
 }
 
 export interface DedupEntry {
-  severity: Severity | 'unknown';
+  severity: Severity | null;
   count: number;
   firstSeenAt: string;
   lastSeenAt: string;

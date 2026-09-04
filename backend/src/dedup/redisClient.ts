@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 import { getRedisClient } from '../shared/redis.client';
 import { DedupEntry } from './types';
-import { Alert } from '../types/alert.types';
+import { Alert, Severity } from '../types/alert.types';
 
 export class DedupRedisService {
   private client: Redis;
@@ -23,7 +23,7 @@ export class DedupRedisService {
     }
 
     return {
-      severity: (data['severity'] as DedupEntry['severity']) || 'unknown',
+      severity: (data['severity'] as Severity) || null,
       count: parseInt(data['count'] || '1', 10),
       firstSeenAt: data['firstSeenAt'] || new Date().toISOString(),
       lastSeenAt: data['lastSeenAt'] || new Date().toISOString(),
@@ -35,7 +35,7 @@ export class DedupRedisService {
     const key = this.getKey(alert.fingerprint);
     const now = new Date().toISOString();
     const entry: DedupEntry = {
-      severity: alert.severity_score || 'unknown',
+      severity: alert.severity_score,
       count: 1,
       firstSeenAt: now,
       lastSeenAt: now,
@@ -44,7 +44,7 @@ export class DedupRedisService {
 
     const multi = this.client.multi();
     multi.hset(key, {
-      severity: entry.severity,
+      severity: entry.severity || '',
       count: '1',
       firstSeenAt: entry.firstSeenAt,
       lastSeenAt: entry.lastSeenAt,
@@ -68,7 +68,7 @@ export class DedupRedisService {
     multi.hincrby(key, 'count', 1);
     multi.hset(key, {
       lastSeenAt: now,
-      severity: alert.severity_score || 'unknown',
+      severity: alert.severity_score || '',
       normalizedAlert: JSON.stringify(alert),
     });
     multi.expire(key, ttlSeconds);
