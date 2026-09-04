@@ -1,0 +1,53 @@
+{
+  "receiver": "alert-fatigue-buster-webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "PostgresHighConnectionCount",
+        "severity": "critical",
+        "service": "database",
+        "instance": "db-primary-01:5432",
+        "env": "production"
+      },
+      "annotations": {
+        "summary": "Postgres connection pool exhausted on primary",
+        "description": "Active connections > 95% of max_connections for > 2m"
+      },
+      "startsAt": "2026-09-04T12:00:00.000Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus.internal/graph?g0.expr=pg_stat_activity_count",
+      "fingerprint": "a1b2c3d4e5f6"
+    },
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "AuthServiceLatencyHigh",
+        "severity": "high",
+        "service": "auth-service",
+        "instance": "auth-api-pod-89df",
+        "env": "production"
+      },
+      "annotations": {
+        "summary": "Auth service p99 latency spike",
+        "description": "p99 latency > 2500ms due to database connection timeout"
+      },
+      "startsAt": "2026-09-04T12:00:15.000Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus.internal/graph?g0.expr=http_request_duration",
+      "fingerprint": "b2c3d4e5f6a1"
+    }
+  ],
+  "groupLabels": {
+    "env": "production"
+  },
+  "commonLabels": {
+    "env": "production"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager.internal:9093",
+  "version": "4",
+  "groupKey": "{}:{env=\"production\"}",
+  "truncatedAlerts": 0
+}
