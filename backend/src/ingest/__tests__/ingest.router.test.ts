@@ -4,8 +4,8 @@ import { computeHmacSignature } from '../../shared/crypto';
 import { closeRedisClient } from '../../shared/redis.client';
 import { clearDeadLetterQueue, getDeadLetterEntries } from '../deadletter';
 import * as dedupModule from '../../dedup';
-import prometheusFiringFixture from '../__fixtures__/prometheus-firing.json';
-import datadogErrorFixture from '../__fixtures__/datadog-error.json';
+import prometheusFiringFixture from '../../__fixtures__/alertmanager/01-normal-critical.json';
+import datadogErrorFixture from '../../__fixtures__/datadog/01-normal-critical.json';
 
 describe('Ingest Router HTTP Endpoints', () => {
   beforeEach(() => {
@@ -49,8 +49,8 @@ describe('Ingest Router HTTP Endpoints', () => {
         .set('Content-Type', 'application/json');
 
       expect(res.status).toBe(200);
-      expect(res.body.received).toBe(2);
-      expect(res.body.processed).toBe(2);
+      expect(res.body.received).toBe(1);
+      expect(res.body.processed).toBe(1);
     });
 
     it('POST /webhook/prometheus (alias) should accept valid payload and return 200', async () => {
@@ -60,8 +60,8 @@ describe('Ingest Router HTTP Endpoints', () => {
         .set('Content-Type', 'application/json');
 
       expect(res.status).toBe(200);
-      expect(res.body.received).toBe(2);
-      expect(res.body.processed).toBe(2);
+      expect(res.body.received).toBe(1);
+      expect(res.body.processed).toBe(1);
     });
 
     it('POST /webhooks/alertmanager should reject malformed payload with 400 and save to DLQ', async () => {
