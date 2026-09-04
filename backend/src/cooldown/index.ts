@@ -1,4 +1,5 @@
-import { Incident } from '../correlation/types';
+import { Incident } from '../types/alert.types';
+import { logger } from '../shared/logger';
 import { CooldownResult } from './types';
 import { checkAndApplyCooldown } from './store';
 import {
@@ -35,8 +36,14 @@ export async function applyCooldown(incident: Incident): Promise<CooldownResult>
   const fingerprint = incident.root_cause.fingerprint;
 
   if (!fingerprint) {
-    throw new Error('Incident is missing a root_cause fingerprint, cannot apply cooldown.');
+    logger.warn({ incident_id: incident.incident_id }, 'Incident is missing a root_cause fingerprint, failing open (bypassing cooldown)');
+    return { allowed: true, suppressedCount: 0 };
   }
 
-  return checkAndApplyCooldown(fingerprint, cooldownMs);
+  try {
+    return await checkAndApplyCooldown(fingerprint, cooldownMs);
+  } catch (err) {
+    logger.error({ err, incident_id: incident.incident_id, fingerprint }, 'Redis failed during cooldown check, failing open to protect critical alerts');
+    return { allowed: true, suppressedCount: 0 };
+  }
 }
