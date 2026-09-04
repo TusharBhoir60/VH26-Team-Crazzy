@@ -1,7 +1,9 @@
 import request from 'supertest';
 import { app } from '../../server';
 import { computeHmacSignature } from '../../shared/crypto';
+import { closeRedisClient } from '../../shared/redis.client';
 import { clearDeadLetterQueue, getDeadLetterEntries } from '../deadletter';
+import * as dedupModule from '../../dedup';
 import prometheusFiringFixture from '../__fixtures__/prometheus-firing.json';
 import datadogErrorFixture from '../__fixtures__/datadog-error.json';
 
@@ -10,6 +12,16 @@ describe('Ingest Router HTTP Endpoints', () => {
     clearDeadLetterQueue();
     delete process.env.ALERTMANAGER_WEBHOOK_SECRET;
     delete process.env.DATADOG_WEBHOOK_SECRET;
+    jest.spyOn(dedupModule, 'dedupe').mockImplementation(async (alert) => ({
+      isDuplicate: false,
+      count: 1,
+      alert,
+      suppressed: false,
+    }));
+  });
+
+  afterAll(async () => {
+    await closeRedisClient();
   });
 
   describe('Health Endpoints', () => {
