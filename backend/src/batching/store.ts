@@ -1,5 +1,4 @@
-import { Incident } from '../correlation/types';
-import { BatchedGroup } from './types';
+import { Incident, BatchedGroup } from '../types/alert.types';
 import { getDestinationChannel } from '../shared/channelMapping';
 
 interface CurrentWindow {
@@ -8,6 +7,9 @@ interface CurrentWindow {
 }
 
 let currentWindow: CurrentWindow | null = null;
+
+// TODO: Migrate to Redis-backed batch store for horizontal scaling consistency.
+// Currently in-memory — each instance maintains its own batch window.
 
 export const addIncidentToBatch = (incident: Incident): void => {
   if (!currentWindow) {
