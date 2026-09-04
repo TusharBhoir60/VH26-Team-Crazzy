@@ -1,35 +1,25 @@
 import { Alert } from '../types/alert.types';
+import { dedupe } from '../dedup';
 import { logger } from '../shared/logger';
 
-export type AlertHandler = (alert: Alert) => Promise<Alert | void>;
+export type AlertHandler = (alert: Alert) => Promise<any>;
 
-// Configurable downstream handler (defaults to in-process logger stub until Dedup stage connects)
-let downstreamHandler: AlertHandler = async (alert: Alert): Promise<Alert> => {
-  logger.info(
-    {
-      fingerprint: alert.fingerprint,
-      alertname: alert.alertname,
-      service: alert.service,
-      source: alert.source,
-      status: alert.status,
-      severity: alert.severity_score,
-    },
-    'Handing off normalized alert to downstream pipeline (Dedup)'
-  );
-  return alert;
+// Connects Ingest directly to Dedup by default
+let downstreamHandler: AlertHandler = async (alert: Alert) => {
+  return await dedupe(alert);
 };
 
 /**
- * Registers a downstream handler (e.g. Dedup stage entrypoint).
+ * Registers a custom downstream handler.
  */
 export function setDownstreamHandler(handler: AlertHandler): void {
   downstreamHandler = handler;
 }
 
 /**
- * Dispatches a normalized alert to the downstream pipeline.
+ * Dispatches a normalized alert to the downstream pipeline (Dedup).
  */
-export async function handleNormalizedAlert(alert: Alert): Promise<Alert | void> {
+export async function handleNormalizedAlert(alert: Alert): Promise<any> {
   try {
     return await downstreamHandler(alert);
   } catch (error) {
