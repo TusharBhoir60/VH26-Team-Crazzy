@@ -12,6 +12,10 @@ export class PagerDutyAdapter implements ChannelAdapter {
 
   async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
     if (!this.routingKey) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[MOCK] PagerDuty delivery successful (No routing key configured)');
+        return { success: true, messageId: 'mock-pd-123' };
+      }
       return { success: false, error: 'PAGERDUTY_ROUTING_KEY is not configured', retryable: false };
     }
 

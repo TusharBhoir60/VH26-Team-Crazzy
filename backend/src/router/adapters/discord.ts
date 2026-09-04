@@ -11,6 +11,10 @@ export class DiscordAdapter implements ChannelAdapter {
 
   async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
     if (!this.webhookUrl) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[MOCK] Discord delivery successful (No webhook URL configured)');
+        return { success: true };
+      }
       return { success: false, error: 'DISCORD_WEBHOOK_URL is not configured', retryable: false };
     }
 

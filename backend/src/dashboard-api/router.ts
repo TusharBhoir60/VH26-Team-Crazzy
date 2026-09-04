@@ -3,7 +3,7 @@ import { getRedisClient } from '../shared/redis.client';
 import { logger } from '../shared/logger';
 import { Incident } from '../types/alert.types';
 import { SafetyGateResult } from '../safety-gate/types';
-import { DeadLetterRecord } from '../ingest/deadletter';
+import { DeadLetterEntry } from '../ingest/deadletter';
 
 export const dashboardRouter = Router();
 
@@ -66,7 +66,7 @@ dashboardRouter.get('/deadletter', async (req: Request, res: Response) => {
     }
 
     const dlqData = await redis.mget(...keys);
-    const dlqItems: DeadLetterRecord[] = dlqData
+    const dlqItems: DeadLetterEntry[] = dlqData
       .filter((data) => data !== null)
       .map((data) => JSON.parse(data as string));
 
@@ -74,5 +74,39 @@ dashboardRouter.get('/deadletter', async (req: Request, res: Response) => {
   } catch (err) {
     logger.error({ err }, 'Dashboard API: Failed to fetch dead letters');
     return res.status(500).json({ error: 'Failed to fetch dead letters' });
+  }
+});
+
+// GET /stats -> Telemetry and KPIs
+dashboardRouter.get('/stats', async (req: Request, res: Response) => {
+  try {
+    const redis = getRedisClient();
+    
+    const [rawTotal, notifSent, critRaw, critNotif] = await Promise.all([
+      redis.get('stats:raw_alerts_total'),
+      redis.get('stats:notifications_sent'),
+      redis.get('stats:critical_raw_total'),
+      redis.get('stats:critical_notified'),
+    ]);
+
+    const raw_alert_count = parseInt(rawTotal || '0', 10);
+    const notifications_sent = parseInt(notifSent || '0', 10);
+    const critical_alerts_total = parseInt(critRaw || '0', 10);
+    const critical_alerts_notified = parseInt(critNotif || '0', 10);
+
+    const reduction_percent = raw_alert_count > 0 
+      ? ((1 - notifications_sent / raw_alert_count) * 100).toFixed(2) 
+      : 0;
+
+    return res.status(200).json({
+      raw_alert_count,
+      notifications_sent,
+      reduction_percent: Number(reduction_percent),
+      critical_alerts_total,
+      critical_alerts_notified,
+    });
+  } catch (err) {
+    logger.error({ err }, 'Dashboard API: Failed to fetch stats');
+    return res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });

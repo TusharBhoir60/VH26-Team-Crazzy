@@ -11,6 +11,10 @@ export class SlackAdapter implements ChannelAdapter {
 
   async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
     if (!this.webhookUrl) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[MOCK] Slack delivery successful (No webhook URL configured)');
+        return { success: true };
+      }
       return { success: false, error: 'SLACK_WEBHOOK_URL is not configured', retryable: false };
     }
 

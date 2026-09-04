@@ -66,6 +66,13 @@ export async function route(
     redis
   );
   
+  if (success) {
+    redis.incr('stats:notifications_sent').catch(() => {});
+    if (severity === 'critical') {
+      redis.incr('stats:critical_notified').catch(() => {});
+    }
+  }
+
   if (!success && severity === 'critical') {
     // Distinct log for critical delivery failure (e.g. failed PagerDuty page)
     const incidentId = 'incidents' in incidentOrBatch ? incidentOrBatch.id : incidentOrBatch.incident_id;
