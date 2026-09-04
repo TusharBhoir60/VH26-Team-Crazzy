@@ -26,7 +26,7 @@ describe('AlertmanagerAdapter', () => {
     const res2 = results[1];
     expect(res2?.alert.alertname).toBe('AuthServiceLatencyHigh');
     expect(res2?.alert.service).toBe('auth-service');
-    expect(res2?.alert.severity_score).toBe('high');
+    expect(res2?.alert.severity_score).toBe('warning');
     expect(res2?.warnings).toHaveLength(0);
   });
 

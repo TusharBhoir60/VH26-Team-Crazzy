@@ -29,7 +29,7 @@ describe('Alertmanager Parser & Normalizer', () => {
       expect(alert2?.alertname).toBe('AuthServiceLatencyHigh');
       expect(alert2?.service).toBe('auth-service');
       expect(alert2?.status).toBe('firing');
-      expect(alert2?.severity_score).toBe('high');
+      expect(alert2?.severity_score).toBe('warning');
     }
   });
 
@@ -49,10 +49,10 @@ describe('Alertmanager Parser & Normalizer', () => {
     expect(mapAlertmanagerSeverity('critical')).toBe('critical');
     expect(mapAlertmanagerSeverity('CRIT')).toBe('critical');
     expect(mapAlertmanagerSeverity('p0')).toBe('critical');
-    expect(mapAlertmanagerSeverity('error')).toBe('high');
-    expect(mapAlertmanagerSeverity('warning')).toBe('medium');
-    expect(mapAlertmanagerSeverity('warn')).toBe('medium');
-    expect(mapAlertmanagerSeverity('info')).toBe('low');
+    expect(mapAlertmanagerSeverity('error')).toBe('warning');
+    expect(mapAlertmanagerSeverity('warning')).toBe('warning');
+    expect(mapAlertmanagerSeverity('warn')).toBe('warning');
+    expect(mapAlertmanagerSeverity('info')).toBe('info');
     expect(mapAlertmanagerSeverity('unknown-custom')).toBeNull();
     expect(mapAlertmanagerSeverity(undefined)).toBeNull();
   });

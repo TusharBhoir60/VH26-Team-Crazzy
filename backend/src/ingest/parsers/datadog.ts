@@ -37,9 +37,9 @@ export function mapDatadogSeverity(
   const priority = (payload.priority || labels['priority'] || labels['severity'])?.toLowerCase().trim();
   if (priority) {
     if (['p1', 'p0', 'critical', 'crit', 'fatal', 'sev0', 'sev1'].includes(priority)) return 'critical';
-    if (['p2', 'high', 'major', 'sev2', 'error'].includes(priority)) return 'high';
-    if (['p3', 'medium', 'warn', 'warning', 'minor', 'sev3'].includes(priority)) return 'medium';
-    if (['p4', 'p5', 'low', 'info', 'informational', 'sev4', 'sev5'].includes(priority)) return 'low';
+    if (['p2', 'high', 'major', 'sev2', 'error'].includes(priority)) return 'warning';
+    if (['p3', 'medium', 'warn', 'warning', 'minor', 'sev3'].includes(priority)) return 'warning';
+    if (['p4', 'p5', 'low', 'info', 'informational', 'sev4', 'sev5'].includes(priority)) return 'info';
   }
 
   // 2. Check alert_type
@@ -49,10 +49,10 @@ export function mapDatadogSeverity(
       return 'critical';
     case 'warning':
     case 'warn':
-      return 'medium';
+      return 'warning';
     case 'info':
     case 'success':
-      return 'low';
+      return 'info';
     default:
       return null;
   }
