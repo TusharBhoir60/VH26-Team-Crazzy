@@ -1,0 +1,11 @@
+{
+  "title": "[Recovered] Database Down",
+  "body": "Description for [Recovered] Database Down",
+  "alert_type": "success",
+  "priority": "P1",
+  "alert_transition": "Recovered",
+  "tags": "env:production,service:primary-db,severity:critical",
+  "date": 1788557025,
+  "id": 2546346,
+  "hostname": "prod-server-01"
+}

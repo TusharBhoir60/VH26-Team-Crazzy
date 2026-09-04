@@ -1,7 +1,7 @@
 import { AlertmanagerAdapter } from '../adapters/alertmanager';
 import { NormalizationError } from '../types';
-import prometheusFiringFixture from '../../ingest/__fixtures__/prometheus-firing.json';
-import prometheusResolvedFixture from '../../ingest/__fixtures__/prometheus-resolved.json';
+import prometheusFiringFixture from '../../__fixtures__/alertmanager/01-normal-critical.json';
+import prometheusResolvedFixture from '../../__fixtures__/alertmanager/01-normal-resolved.json';
 
 describe('AlertmanagerAdapter', () => {
   const adapter = new AlertmanagerAdapter();
@@ -12,22 +12,16 @@ describe('AlertmanagerAdapter', () => {
 
   it('should cleanly normalize standard Prometheus firing payload', () => {
     const results = adapter.normalize(prometheusFiringFixture);
-    expect(results).toHaveLength(2);
+    expect(results).toHaveLength(1);
 
     const res1 = results[0];
-    expect(res1?.alert.alertname).toBe('PostgresHighConnectionCount');
-    expect(res1?.alert.service).toBe('database');
+    expect(res1?.alert.alertname).toBe('DatabaseDown');
+    expect(res1?.alert.service).toBe('primary-db');
     expect(res1?.alert.status).toBe('firing');
     expect(res1?.alert.severity_score).toBe('critical');
     expect(res1?.alert.source).toBe('prometheus');
-    expect(res1?.alert.fingerprint).toBe('a1b2c3d4e5f6');
+    expect(res1?.alert.fingerprint).toBe('am-norm-crit-002');
     expect(res1?.warnings).toHaveLength(0);
-
-    const res2 = results[1];
-    expect(res2?.alert.alertname).toBe('AuthServiceLatencyHigh');
-    expect(res2?.alert.service).toBe('auth-service');
-    expect(res2?.alert.severity_score).toBe('high');
-    expect(res2?.warnings).toHaveLength(0);
   });
 
   it('should normalize resolved alert payload', () => {

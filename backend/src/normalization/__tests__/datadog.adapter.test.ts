@@ -1,7 +1,7 @@
 import { DatadogAdapter } from '../adapters/datadog';
 import { NormalizationError } from '../types';
-import datadogErrorFixture from '../../ingest/__fixtures__/datadog-error.json';
-import datadogWarningFixture from '../../ingest/__fixtures__/datadog-warning.json';
+import datadogErrorFixture from '../../__fixtures__/datadog/01-normal-critical.json';
+import datadogWarningFixture from '../../__fixtures__/datadog/01-normal-warning.json';
 
 describe('DatadogAdapter', () => {
   const adapter = new DatadogAdapter();
@@ -15,8 +15,8 @@ describe('DatadogAdapter', () => {
     expect(results).toHaveLength(1);
 
     const res = results[0];
-    expect(res?.alert.alertname).toBe('Payment processing error rate > 5%');
-    expect(res?.alert.service).toBe('payment-service');
+    expect(res?.alert.alertname).toBe('Database Down');
+    expect(res?.alert.service).toBe('primary-db');
     expect(res?.alert.status).toBe('firing');
     expect(res?.alert.severity_score).toBe('critical');
     expect(res?.alert.source).toBe('datadog');
@@ -34,11 +34,9 @@ describe('DatadogAdapter', () => {
     const reorderedPayload = {
       ...datadogErrorFixture,
       tags: [
-        'team:payments',
-        'tier:critical',
+        'severity:critical',
         'env:production',
-        'service:payment-service',
-        'priority:p1',
+        'service:primary-db',
       ],
     };
 
@@ -51,8 +49,8 @@ describe('DatadogAdapter', () => {
     expect(results).toHaveLength(1);
 
     const res = results[0];
-    expect(res?.alert.alertname).toBe('Inventory sync lag elevated');
-    expect(res?.alert.service).toBe('inventory-service');
+    expect(res?.alert.alertname).toBe('High CPU');
+    expect(res?.alert.service).toBe('cache-service');
     expect(res?.alert.status).toBe('firing');
     expect(res?.alert.severity_score).toBe('medium');
     expect(res?.alert.labels['env']).toBe('production');

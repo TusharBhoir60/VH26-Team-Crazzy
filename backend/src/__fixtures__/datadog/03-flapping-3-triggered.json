@@ -1,0 +1,11 @@
+{
+  "title": "[Triggered] Network Flap",
+  "body": "Description for [Triggered] Network Flap",
+  "alert_type": "error",
+  "priority": "P2",
+  "alert_transition": "Triggered",
+  "tags": "env:production,service:network-switch,severity:high",
+  "date": 1788557025,
+  "id": 9926419,
+  "hostname": "prod-server-01"
+}

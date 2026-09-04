@@ -1,7 +1,7 @@
 import { normalizeDatadogPayload, parseDatadogTags, mapDatadogSeverity } from '../parsers/datadog';
 import { DatadogPayloadSchema } from '../schemas/datadog.schema';
-import datadogErrorFixture from '../__fixtures__/datadog-error.json';
-import datadogWarningFixture from '../__fixtures__/datadog-warning.json';
+import datadogErrorFixture from '../../__fixtures__/datadog/01-normal-critical.json';
+import datadogWarningFixture from '../../__fixtures__/datadog/01-normal-warning.json';
 
 describe('Datadog Parser & Normalizer', () => {
   it('should parse tag arrays and comma-separated tags into key-value records', () => {
@@ -27,8 +27,8 @@ describe('Datadog Parser & Normalizer', () => {
       expect(alerts).toHaveLength(1);
 
       const alert = alerts[0];
-      expect(alert?.alertname).toBe('Payment processing error rate > 5%');
-      expect(alert?.service).toBe('payment-service');
+      expect(alert?.alertname).toBe('Database Down');
+      expect(alert?.service).toBe('primary-db');
       expect(alert?.status).toBe('firing');
       expect(alert?.source).toBe('datadog');
       expect(alert?.severity_score).toBe('critical');
@@ -47,8 +47,8 @@ describe('Datadog Parser & Normalizer', () => {
       expect(alerts).toHaveLength(1);
 
       const alert = alerts[0];
-      expect(alert?.alertname).toBe('Inventory sync lag elevated');
-      expect(alert?.service).toBe('inventory-service');
+      expect(alert?.alertname).toBe('High CPU');
+      expect(alert?.service).toBe('cache-service');
       expect(alert?.status).toBe('firing');
       expect(alert?.severity_score).toBe('medium');
     }

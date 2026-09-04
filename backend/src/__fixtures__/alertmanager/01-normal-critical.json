@@ -1,0 +1,33 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "DatabaseDown",
+        "severity": "critical",
+        "service": "primary-db",
+        "env": "production"
+      },
+      "annotations": {
+        "summary": "DatabaseDown on primary-db",
+        "description": "Description for DatabaseDown"
+      },
+      "startsAt": "2026-09-04T21:23:45.532Z",
+      "generatorURL": "http://prometheus:9090",
+      "fingerprint": "am-norm-crit-002"
+    }
+  ],
+  "groupLabels": {
+    "env": "production"
+  },
+  "commonLabels": {
+    "env": "production"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "{}:{env=\"production\"}",
+  "truncatedAlerts": 0
+}
