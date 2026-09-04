@@ -1,11 +1,11 @@
 import Redis from 'ioredis';
 import { logger } from '../shared/logger';
-import { Alert, BatchedGroup } from '../types/alert.types';
+import { Incident, BatchedGroup } from '../types/alert.types';
 
 const DEADLETTER_KEY = 'router:deadletter';
 
 export interface DeadLetterPayload {
-  incident: Alert | BatchedGroup;
+  incident: Incident | BatchedGroup;
   channel: string;
   content: string;
   error: string;

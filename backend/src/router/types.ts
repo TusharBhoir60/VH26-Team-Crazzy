@@ -1,4 +1,4 @@
-import { Alert, BatchedGroup } from '../types/alert.types';
+import { Incident, BatchedGroup } from '../types/alert.types';
 
 export interface DeliveryResult {
   success: boolean;
@@ -8,7 +8,7 @@ export interface DeliveryResult {
 }
 
 export interface ChannelAdapter {
-  send(content: string, incident: Alert | BatchedGroup): Promise<DeliveryResult>;
+  send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult>;
 }
 
 export interface RouterConfig {
