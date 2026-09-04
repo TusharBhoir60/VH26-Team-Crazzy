@@ -1,12 +1,12 @@
-import { Alert } from '../types/alert.types';
+import { Alert, Severity } from '../types/alert.types';
 import { TopologyGraph } from './types';
 import { isUpstreamOf } from './topology/traversal';
 
-const severityWeight = {
+const severityWeight: Record<Severity, number> = {
   critical: 4,
-  high: 3,
-  medium: 2,
-  low: 1,
+  warning: 3,
+  info: 2,
+  unknown: 1,
 };
 
 export function selectRootCause(alerts: Alert[], graph: TopologyGraph): Alert {
