@@ -1,0 +1,28 @@
+services:
+  database:
+    depends_on: []
+    tier: critical
+
+  auth-service:
+    depends_on: [database]
+    tier: critical
+
+  payment-service:
+    depends_on: [database, auth-service]
+    tier: critical
+
+  checkout-api:
+    depends_on: [payment-service]
+    tier: high
+
+  inventory-service:
+    depends_on: [database]
+    tier: high
+
+  frontend:
+    depends_on: [checkout-api, inventory-service]
+    tier: medium
+
+  notification-service:
+    depends_on: [database]
+    tier: low
