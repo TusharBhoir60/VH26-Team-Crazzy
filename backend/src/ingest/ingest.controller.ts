@@ -4,10 +4,14 @@ import { handleNormalizedAlert } from './handoff';
 import { recordDeadLetter } from './deadletter';
 import { logger } from '../shared/logger';
 
+import { getRedisClient } from '../shared/redis.client';
+
 export async function handleAlertmanagerWebhook(req: Request, res: Response): Promise<void> {
   try {
     const results = await normalize('prometheus', req.body);
     const alerts = results.map((r) => r.alert);
+
+    const redis = getRedisClient();
 
     // Fast-ack response within 200ms
     res.status(200).json({
@@ -19,6 +23,12 @@ export async function handleAlertmanagerWebhook(req: Request, res: Response): Pr
 
     // Asynchronously dispatch normalized alerts to downstream pipeline
     for (const alert of alerts) {
+      // Telemetry
+      redis.incr('stats:raw_alerts_total').catch(() => {});
+      if (alert.severity_score === 'critical') {
+        redis.incr('stats:critical_raw_total').catch(() => {});
+      }
+
       handleNormalizedAlert(alert).catch((err) => {
         logger.error({ err, fingerprint: alert.fingerprint }, 'Failed during downstream handoff');
       });
@@ -56,6 +66,8 @@ export async function handleDatadogWebhook(req: Request, res: Response): Promise
     const results = await normalize('datadog', req.body);
     const alerts = results.map((r) => r.alert);
 
+    const redis = getRedisClient();
+
     // Fast-ack response within 200ms
     res.status(200).json({
       received: 1,
@@ -64,6 +76,12 @@ export async function handleDatadogWebhook(req: Request, res: Response): Promise
 
     // Dispatch to downstream pipeline
     for (const alert of alerts) {
+      // Telemetry
+      redis.incr('stats:raw_alerts_total').catch(() => {});
+      if (alert.severity_score === 'critical') {
+        redis.incr('stats:critical_raw_total').catch(() => {});
+      }
+
       handleNormalizedAlert(alert).catch((err) => {
         logger.error({ err, fingerprint: alert.fingerprint }, 'Failed during downstream handoff');
       });

@@ -4,10 +4,14 @@ import { DedupEntry } from './types';
 import { Alert, Severity } from '../types/alert.types';
 
 export class DedupRedisService {
-  private client: Redis;
+  private customClient?: Redis;
 
   constructor(customClient?: Redis) {
-    this.client = customClient ?? getRedisClient();
+    this.customClient = customClient;
+  }
+
+  private get client(): Redis {
+    return this.customClient ?? getRedisClient();
   }
 
   public getKey(fingerprint: string): string {

@@ -18,9 +18,10 @@ export const app: Express = express();
 app.use(helmet());
 
 // Rate limiter: 500 requests per 1-minute window
+// Increased to 5000 for synthetic load testing
 const limiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 500,
+  max: 5000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
@@ -42,6 +43,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Mount Ingest Webhooks & Health routes
 app.use('/', ingestRouter);
+
+// Mount Dashboard API
+app.use('/api/v1/dashboard', dashboardRouter);
 
 // Global 404 handler
 app.use((req: Request, res: Response) => {

@@ -16,7 +16,9 @@ jest.mock('../../shared/logger', () => ({
   }
 }));
 
-const mockRedis: any = {};
+const mockRedis: any = {
+  incr: jest.fn().mockResolvedValue(1)
+};
 
 const sampleRootCauseAlert: Alert = {
   fingerprint: 'fp1',

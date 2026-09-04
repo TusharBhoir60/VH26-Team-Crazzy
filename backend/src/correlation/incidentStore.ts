@@ -1,15 +1,13 @@
-import Redis from 'ioredis';
+import { getRedisClient } from '../shared/redis.client';
 import { Incident } from './types';
 import { Alert } from '../types/alert.types';
-
-// Use a shared Redis instance or create a new one based on env
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
 import { INCIDENT_TTL_SECONDS } from './config';
+
 const INCIDENT_PREFIX = 'incident:';
 
 export async function getActiveIncidentByServices(services: string[]): Promise<Incident | null> {
   if (services.length === 0) return null;
+  const redis = getRedisClient();
   
   // Since multiple services might map to the same incident, 
   // we check if any of these services have an active incident ID mapped.
@@ -39,6 +37,7 @@ export async function getActiveIncidentByServices(services: string[]): Promise<I
 }
 
 export async function saveIncident(incident: Incident, affectedServices: string[]): Promise<void> {
+  const redis = getRedisClient();
   const pipeline = redis.pipeline();
   
   // Save the incident object
@@ -62,5 +61,6 @@ export async function saveIncident(incident: Incident, affectedServices: string[
 
 // Ensure the client can be closed during shutdown/tests
 export function closeRedisConnection() {
+  const redis = getRedisClient();
   return redis.quit();
 }
