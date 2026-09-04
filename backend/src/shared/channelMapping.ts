@@ -1,14 +1,15 @@
 import { Severity } from '../types/alert.types';
 
-export enum NotificationChannel {
-  PAGERDUTY = 'pagerduty',
-  SLACK = 'slack',
-  DISCORD = 'discord',
-}
-
-export const severityToChannelMapping: Record<Severity, NotificationChannel> = {
-  'critical': NotificationChannel.PAGERDUTY,
-  'warning': NotificationChannel.SLACK,
-  'info': NotificationChannel.DISCORD,
-  'unknown': NotificationChannel.DISCORD,
+export const getDestinationChannel = (severity: Severity | null): string => {
+  switch (severity) {
+    case 'critical':
+      return 'pagerduty';
+    case 'warning':
+      return 'slack';
+    case 'info':
+      return 'email-discord';
+    case 'unknown':
+    default:
+      return 'slack'; // Safe fallback
+  }
 };
