@@ -15,6 +15,23 @@ export interface Alert {
   severity_score: Severity | null;
   cluster_id: string | null;        // uuid, null if uncorrelated
   is_root_cause: boolean;
+  // Fields that might be populated by downstream pipeline stages:
+  final_severity?: Severity;
+  applied_rules?: string[];
+  aiEnrichment?: {
+    narrative?: string;
+  };
+}
+
+export interface BatchedGroup {
+  id: string;
+  incidents: Alert[];
+  severity: Severity;
+  service?: string;
+  cooldown_suppressed_count?: number;
+  aiEnrichment?: {
+    narrative?: string;
+  };
 }
 
 export interface Cluster {
