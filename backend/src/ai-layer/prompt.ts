@@ -35,12 +35,12 @@ TASK:
 Analyze this incident and respond with a JSON object in exactly this format:
 {
   "rootCauseSuggestion": "<string: which service/alert is most likely the root cause and why>",
-  "suggestedSeverity": "<one of: critical, high, medium, low>",
+  "suggestedSeverity": "<one of: critical, warning, info, unknown>",
   "narrative": "<string: 2-4 sentence human-readable summary of the incident for on-call engineers>"
 }
 
 CONSTRAINTS:
-- suggestedSeverity must be one of: critical, high, medium, low
+- suggestedSeverity must be one of: critical, warning, info, unknown
 - You may escalate severity if evidence warrants it, but never suggest a lower severity than ${incident.severity}
 - narrative should be actionable and concise — what happened, what's affected, what to check first
 - Respond ONLY with the JSON object, no additional text, no markdown code fences
@@ -67,12 +67,12 @@ Analyze the health of this service based on the alerts above. Determine the root
 Respond with a JSON object in exactly this format:
 {
   "rootCauseSuggestion": "<string: what is likely failing inside or around this service>",
-  "suggestedSeverity": "<one of: critical, high, medium, low>",
+  "suggestedSeverity": "<one of: critical, warning, info, unknown>",
   "narrative": "<string: 2-4 sentence human-readable summary of the service health>"
 }
 
 CONSTRAINTS:
-- suggestedSeverity must be one of: critical, high, medium, low
+- suggestedSeverity must be one of: critical, warning, info, unknown
 - narrative should be actionable and concise
 - Respond ONLY with the JSON object, no additional text, no markdown code fences
 

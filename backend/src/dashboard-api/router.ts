@@ -230,9 +230,11 @@ dashboardRouter.get('/topology', async (req: Request, res: Response) => {
       let status = 'Healthy';
       if (maxSev === 'critical') status = 'Critical';
       else if (maxSev === 'high' || maxSev === 'medium') status = 'Degraded';
-      
-      parsed.services[service].status = status;
-      parsed.services[service].active_alerts = activeAlerts;
+      const serviceObj = parsed.services[service];
+      if (serviceObj) {
+        serviceObj.status = status;
+        serviceObj.active_alerts = activeAlerts;
+      }
     }
 
     return res.status(200).json(parsed);
@@ -358,7 +360,7 @@ dashboardRouter.get('/services', async (req: Request, res: Response) => {
 // GET /services/:id/reasoning -> AI-powered service health reasoning
 dashboardRouter.get('/services/:id/reasoning', async (req: Request, res: Response) => {
   try {
-    const serviceId = req.params.id;
+    const serviceId = req.params.id as string;
     const redis = getRedisClient();
 
     // Fetch recent alerts to find active ones for this service

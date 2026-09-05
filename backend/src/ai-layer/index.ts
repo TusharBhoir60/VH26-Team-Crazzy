@@ -13,7 +13,7 @@ const GROQ_MODEL = 'groq/compound-mini';
  */
 const AiEnrichmentResultSchema = z.object({
   rootCauseSuggestion: z.string().min(1),
-  suggestedSeverity: z.enum(['critical', 'high', 'medium', 'low', 'warning', 'info', 'unknown']),
+  suggestedSeverity: z.enum(['critical', 'warning', 'info', 'unknown']),
   narrative: z.string().min(1),
 });
 
@@ -212,7 +212,7 @@ export async function getServiceHealthReasoning(
 
     const result = AiEnrichmentResultSchema.safeParse(parsed);
     if (!result.success) {
-      logger.error({ errors: result.error.errors, parsed }, 'Groq response failed schema validation');
+      logger.error({ errors: result.error.issues, parsed }, 'Groq response failed schema validation');
       return null;
     }
 
