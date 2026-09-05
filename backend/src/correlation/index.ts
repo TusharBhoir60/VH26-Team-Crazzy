@@ -8,13 +8,13 @@ import { getActiveIncidentByServices, saveIncident } from './incidentStore';
 
 const severityLevels: Record<Severity, number> = {
   critical: 4,
-  high: 3,
-  medium: 2,
-  low: 1,
+  warning: 3,
+  info: 2,
+  unknown: 1,
 };
 
 function getHighestSeverity(alerts: Alert[]): Severity {
-  let highest: Severity = 'low';
+  let highest: Severity = 'unknown';
   let highestVal = 0;
 
   for (const alert of alerts) {
@@ -29,7 +29,7 @@ function getHighestSeverity(alerts: Alert[]): Severity {
   return highest;
 }
 
-const MAX_GROUP_SIZE = 100;
+import { MAX_GROUP_SIZE } from './config';
 
 export async function correlate(alert: Alert): Promise<Incident> {
   const graph = await loadTopologyGraph();
@@ -70,7 +70,7 @@ export async function correlate(alert: Alert): Promise<Incident> {
       incident_id: crypto.randomUUID(),
       root_cause: alert,
       alerts: [alert],
-      severity: alert.severity_score || 'low',
+      severity: alert.severity_score || 'unknown',
       summary: `${alert.service} isolated alert`,
       created_at: new Date().toISOString()
     };

@@ -28,7 +28,7 @@ describe('Severity Service', () => {
     const alert: Alert = {
       fingerprint: 'test-1',
       alertname: 'HighCPU',
-      service: 'internal-dashboard', // tier-3
+      service: 'frontend', // tier-3
       labels: {},
       status: 'firing',
       source: 'prometheus',
@@ -76,7 +76,7 @@ describe('Severity Service', () => {
     const alert: Alert = {
       fingerprint: 'test-2',
       alertname: 'Test',
-      service: 'payment-gateway', // tier-1
+      service: 'payments-service', // tier-1
       labels: {},
       status: 'firing',
       source: 'prometheus',

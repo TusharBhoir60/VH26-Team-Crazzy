@@ -1,4 +1,4 @@
-import { Incident } from '../safety-gate/types';
+import { Incident } from '../types/alert.types';
 
 /**
  * Builds the structured prompt sent to Groq.
@@ -18,17 +18,15 @@ export function buildIncidentPrompt(incident: Incident): string {
   return `You are an expert SRE analyzing a correlated incident in a production monitoring system.
 
 INCIDENT SUMMARY:
-- Cluster ID: ${incident.cluster_id}
+- Incident ID: ${incident.incident_id}
 - Deterministic Severity: ${incident.severity}
-- Affected Services: ${incident.affected_services.join(', ')}
-- Downstream Alert Count: ${incident.downstream_count}
-- Suppressed Duplicate Count: ${incident.raw_alert_count_suppressed}
+- Affected Services: ${Array.from(new Set(incident.alerts.map((a) => a.service))).join(', ')}
+- Total Alerts: ${incident.alerts.length}
 
 ROOT CAUSE ALERT (deterministic):
 - Alert Name: ${rootAlert?.alertname ?? 'unknown'}
 - Service: ${rootAlert?.service ?? 'unknown'}
 - Severity: ${rootAlert?.severity_score ?? 'unknown'}
-- Confidence: ${incident.root_cause?.confidence ?? 'unknown'}
 
 CONTRIBUTING ALERTS:
 ${contributingAlerts || '  (none)'}

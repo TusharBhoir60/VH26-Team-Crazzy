@@ -1,9 +1,13 @@
+import { useState } from 'react';
+
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+  const [isSignedIn, setIsSignedIn] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navItems = [
     { id: 'overview', label: 'Overview', icon: 'dashboard' },
     { id: 'incidents', label: 'Incidents', icon: 'confirmation_number', badge: '3' },
@@ -68,27 +72,48 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       </div>
 
       {/* Footer Profile & Workspace */}
-      <div className="flex flex-col gap-3 pt-2">
-        <div className="p-3 rounded-2xl bg-[#f7f8fd] border border-slate-100/80 flex items-center justify-between cursor-pointer hover:bg-slate-100/80 transition-colors">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#7c83f6] text-white flex items-center justify-center font-bold text-xs shadow-sm">E</div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-[13px] font-bold text-on-surface">Ecom Web App</span>
-              <span className="text-[11px] text-on-surface-variant">Production</span>
+      <div className="flex flex-col gap-3 pt-2 relative">
+        {isMenuOpen && (
+          <div className="absolute bottom-full left-0 mb-2 w-full p-2 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 flex flex-col gap-1 z-50">
+            <div className="px-3 py-2 border-b border-slate-100 mb-1">
+              <div className="text-[13px] font-bold text-on-surface">{isSignedIn ? 'Tyler B.' : 'Guest User'}</div>
+              <div className="text-[11px] text-slate-500">{isSignedIn ? 'tyler@workemail.com' : 'Not signed in'}</div>
             </div>
+            <button
+              onClick={() => {
+                setIsSignedIn(!isSignedIn);
+                setIsMenuOpen(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors w-full text-left"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {isSignedIn ? 'logout' : 'login'}
+              </span>
+              {isSignedIn ? 'Sign out' : 'Sign in (Work email only)'}
+            </button>
           </div>
-          <span className="material-symbols-outlined text-[16px] text-on-surface-variant">unfold_more</span>
-        </div>
+        )}
 
-        <div className="flex items-center justify-between p-2 rounded-2xl hover:bg-slate-50 cursor-pointer transition-colors">
+        <div 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="flex items-center justify-between p-2 rounded-2xl hover:bg-slate-50 cursor-pointer transition-colors"
+        >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 to-indigo-500 text-white flex items-center justify-center font-semibold text-xs shadow-sm ring-2 ring-white">TB</div>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 to-indigo-500 text-white flex items-center justify-center font-semibold text-xs shadow-sm ring-2 ring-white">
+              {isSignedIn ? 'TB' : '?'}
+            </div>
             <div className="flex flex-col leading-none">
-              <span className="text-[13px] font-bold text-on-surface">Tyler B.</span>
-              <span className="text-[11px] text-on-surface-variant mt-0.5">Lead SRE</span>
+              <span className="text-[13px] font-bold text-on-surface">
+                {isSignedIn ? 'Tyler B.' : 'Sign In'}
+              </span>
+              <span className="text-[11px] text-on-surface-variant mt-0.5">
+                {isSignedIn ? 'tyler@workemail.com' : 'Work Email Only'}
+              </span>
             </div>
           </div>
-          <span className="material-symbols-outlined text-[16px] text-on-surface-variant">more_vert</span>
+          <span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+            {isMenuOpen ? 'expand_more' : 'expand_less'}
+          </span>
         </div>
       </div>
     </aside>

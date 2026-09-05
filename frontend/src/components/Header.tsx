@@ -23,12 +23,6 @@ export function Header({ title }: HeaderProps) {
           <span>May 06 – Jun 05, 2024</span>
           <span className="material-symbols-outlined text-[17px] text-slate-400">expand_more</span>
         </div>
-        <button className="w-10 h-10 clay-pill flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all" type="button" title="Filter">
-          <span className="material-symbols-outlined text-[20px]">filter_list</span>
-        </button>
-        <button className="w-10 h-10 clay-pill flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all" type="button" title="More options">
-          <span className="material-symbols-outlined text-[20px]">more_horiz</span>
-        </button>
       </div>
     </header>
   );

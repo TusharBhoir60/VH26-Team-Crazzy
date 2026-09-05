@@ -1,0 +1,11 @@
+{
+  "title": "[Recovered] Network Flap",
+  "body": "Description for [Recovered] Network Flap",
+  "alert_type": "success",
+  "priority": "P2",
+  "alert_transition": "Recovered",
+  "tags": "env:production,service:network-switch,severity:high",
+  "date": 1788557025,
+  "id": 5093997,
+  "hostname": "prod-server-01"
+}

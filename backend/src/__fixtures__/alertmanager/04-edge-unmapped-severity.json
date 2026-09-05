@@ -1,0 +1,33 @@
+{
+  "receiver": "webhook",
+  "status": "firing",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "UnknownError",
+        "severity": "banana",
+        "service": "fruit-service",
+        "env": "production"
+      },
+      "annotations": {
+        "summary": "UnknownError on fruit-service",
+        "description": "Description for UnknownError"
+      },
+      "startsAt": "2026-09-04T21:23:45.540Z",
+      "generatorURL": "http://prometheus:9090",
+      "fingerprint": "am-edge-banana"
+    }
+  ],
+  "groupLabels": {
+    "env": "production"
+  },
+  "commonLabels": {
+    "env": "production"
+  },
+  "commonAnnotations": {},
+  "externalURL": "http://alertmanager:9093",
+  "version": "4",
+  "groupKey": "{}:{env=\"production\"}",
+  "truncatedAlerts": 0
+}

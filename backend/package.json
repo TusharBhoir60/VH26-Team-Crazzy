@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:load": "tsx ../docs/testing/alert-generator.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/ioredis-mock": "^8.2.8",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^26.4.1",
@@ -36,10 +38,12 @@
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "@types/uuid": "^10.0.0",
+    "ioredis-mock": "^8.13.1",
     "jest": "^30.5.1",
     "nock": "^14.0.17",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.3"
   }
 }

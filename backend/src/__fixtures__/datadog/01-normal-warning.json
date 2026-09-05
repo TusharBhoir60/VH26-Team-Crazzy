@@ -1,0 +1,11 @@
+{
+  "title": "[Triggered] High CPU",
+  "body": "Description for [Triggered] High CPU",
+  "alert_type": "warning",
+  "priority": "P3",
+  "alert_transition": "Triggered",
+  "tags": "env:production,service:cache-service,severity:warning",
+  "date": 1788557025,
+  "id": 118373,
+  "hostname": "prod-server-01"
+}

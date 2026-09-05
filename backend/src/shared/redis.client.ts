@@ -1,23 +1,30 @@
 import Redis from 'ioredis';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const RedisMock = require('ioredis-mock');
 import { logger } from './logger';
 
 let redisInstance: Redis | null = null;
 
 export function getRedisClient(): Redis {
   if (!redisInstance) {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    redisInstance = new Redis(redisUrl, {
-      maxRetriesPerRequest: 1,
-      enableReadyCheck: false,
-      lazyConnect: true,
-      retryStrategy(times) {
-        if (process.env.NODE_ENV === 'test') {
-          return null; // Stop retrying immediately in tests
-        }
-        const delay = Math.min(times * 100, 3000);
-        return delay;
-      },
-    });
+    if (process.env.USE_MOCK_REDIS === 'true' || process.env.NODE_ENV === 'test') {
+      logger.info('Initializing ioredis-mock for local development');
+      redisInstance = new RedisMock() as unknown as Redis;
+    } else {
+      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      redisInstance = new Redis(redisUrl, {
+        maxRetriesPerRequest: 1,
+        enableReadyCheck: false,
+        lazyConnect: true,
+        retryStrategy(times) {
+          if (process.env.NODE_ENV === 'test') {
+            return null; // Stop retrying immediately in tests
+          }
+          const delay = Math.min(times * 100, 3000);
+          return delay;
+        },
+      });
+    }
 
     redisInstance.on('connect', () => {
       logger.info('Connected to Redis');

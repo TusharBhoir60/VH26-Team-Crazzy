@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Alert, BatchedGroup } from '../../types/alert.types';
+import { Incident, BatchedGroup } from '../../types/alert.types';
 import { ChannelAdapter, DeliveryResult } from '../types';
 
 export class PagerDutyAdapter implements ChannelAdapter {
@@ -10,8 +10,12 @@ export class PagerDutyAdapter implements ChannelAdapter {
     this.routingKey = routingKey || process.env.PAGERDUTY_ROUTING_KEY || '';
   }
 
-  async send(content: string, incident: Alert | BatchedGroup): Promise<DeliveryResult> {
+  async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
     if (!this.routingKey) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[MOCK] PagerDuty delivery successful (No routing key configured)');
+        return { success: true, messageId: 'mock-pd-123' };
+      }
       return { success: false, error: 'PAGERDUTY_ROUTING_KEY is not configured', retryable: false };
     }
 

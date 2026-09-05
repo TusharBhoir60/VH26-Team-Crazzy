@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { logger } from '../shared/logger';
-import { Alert, BatchedGroup } from '../types/alert.types';
+import { Incident, BatchedGroup } from '../types/alert.types';
 import { ChannelAdapter, RouterConfig } from './types';
 import { storeDeadLetter } from './deadletter';
 
@@ -10,7 +10,7 @@ import { storeDeadLetter } from './deadletter';
 export async function sendWithRetry(
   adapter: ChannelAdapter,
   content: string,
-  incident: Alert | BatchedGroup,
+  incident: Incident | BatchedGroup,
   channelName: string,
   config: RouterConfig,
   redis: Redis

@@ -1,0 +1,5 @@
+{
+  "body": "CRITICAL ALERT",
+  "priority": "P1",
+  "alert_type": "error"
+}

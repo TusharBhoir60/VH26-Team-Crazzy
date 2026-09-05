@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import { Alert, BatchedGroup } from '../types/alert.types';
+import { Incident, BatchedGroup } from '../types/alert.types';
 import { NotificationChannel, severityToChannelMapping } from '../shared/channelMapping';
 import { logger } from '../shared/logger';
 import { formatNotification } from './formatNotification';
@@ -21,15 +21,15 @@ const DEFAULT_CONFIG: RouterConfig = {
   initialBackoffMs: 2000,
 };
 
-function getSeverity(incidentOrBatch: Alert | BatchedGroup) {
+function getSeverity(incidentOrBatch: Incident | BatchedGroup) {
   if ('incidents' in incidentOrBatch) {
     return incidentOrBatch.severity;
   }
-  return incidentOrBatch.final_severity || incidentOrBatch.severity_score;
+  return incidentOrBatch.severity;
 }
 
 export async function route(
-  incidentOrBatch: Alert | BatchedGroup,
+  incidentOrBatch: Incident | BatchedGroup,
   redis: Redis,
   config: RouterConfig = DEFAULT_CONFIG
 ): Promise<void> {
@@ -66,9 +66,16 @@ export async function route(
     redis
   );
   
+  if (success) {
+    redis.incr('stats:notifications_sent').catch(() => {});
+    if (severity === 'critical') {
+      redis.incr('stats:critical_notified').catch(() => {});
+    }
+  }
+
   if (!success && severity === 'critical') {
     // Distinct log for critical delivery failure (e.g. failed PagerDuty page)
-    const incidentId = 'id' in incidentOrBatch ? incidentOrBatch.id : incidentOrBatch.fingerprint;
+    const incidentId = 'incidents' in incidentOrBatch ? incidentOrBatch.id : incidentOrBatch.incident_id;
     logger.fatal(
       { channel, severity, incidentId },
       'router.critical_delivery_failed: CRITICAL ALERT DELIVERY FAILED'

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Alert, BatchedGroup } from '../../types/alert.types';
+import { Incident, BatchedGroup } from '../../types/alert.types';
 import { ChannelAdapter, DeliveryResult } from '../types';
 
 export class DiscordAdapter implements ChannelAdapter {
@@ -9,8 +9,12 @@ export class DiscordAdapter implements ChannelAdapter {
     this.webhookUrl = webhookUrl || process.env.DISCORD_WEBHOOK_URL || '';
   }
 
-  async send(content: string, incident: Alert | BatchedGroup): Promise<DeliveryResult> {
+  async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
     if (!this.webhookUrl) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[MOCK] Discord delivery successful (No webhook URL configured)');
+        return { success: true };
+      }
       return { success: false, error: 'DISCORD_WEBHOOK_URL is not configured', retryable: false };
     }
 

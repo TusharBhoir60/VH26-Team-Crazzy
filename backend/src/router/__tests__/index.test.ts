@@ -1,7 +1,7 @@
 import { route } from '../index';
 import * as retry from '../retry';
 import { logger } from '../../shared/logger';
-import { Alert, AlertStatus, Severity, Source } from '../../types/alert.types';
+import { Alert, AlertStatus, Severity, Source, Incident } from '../../types/alert.types';
 import { NotificationChannel } from '../../shared/channelMapping';
 
 jest.mock('../retry', () => ({
@@ -16,9 +16,11 @@ jest.mock('../../shared/logger', () => ({
   }
 }));
 
-const mockRedis: any = {};
+const mockRedis: any = {
+  incr: jest.fn().mockResolvedValue(1)
+};
 
-const baseAlert: Alert = {
+const sampleRootCauseAlert: Alert = {
   fingerprint: 'fp1',
   alertname: 'HighCPU',
   service: 'api-gateway',
@@ -32,6 +34,15 @@ const baseAlert: Alert = {
   is_root_cause: true,
 };
 
+const baseIncident: Incident = {
+  incident_id: 'fp1',
+  root_cause: sampleRootCauseAlert,
+  alerts: [sampleRootCauseAlert],
+  severity: 'warning',
+  summary: 'HighCPU',
+  created_at: '2026-09-01T00:00:00Z',
+};
+
 describe('Router Index', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -40,7 +51,7 @@ describe('Router Index', () => {
   it('routes a critical alert to PagerDuty', async () => {
     (retry.sendWithRetry as jest.Mock).mockResolvedValue(true);
     
-    await route({ ...baseAlert, final_severity: 'critical' }, mockRedis);
+    await route({ ...baseIncident, severity: 'critical' }, mockRedis);
     
     expect(retry.sendWithRetry).toHaveBeenCalledWith(
       expect.anything(),
@@ -55,7 +66,7 @@ describe('Router Index', () => {
   it('routes a warning alert to Slack', async () => {
     (retry.sendWithRetry as jest.Mock).mockResolvedValue(true);
     
-    await route({ ...baseAlert, final_severity: 'warning' }, mockRedis);
+    await route({ ...baseIncident, severity: 'warning' }, mockRedis);
     
     expect(retry.sendWithRetry).toHaveBeenCalledWith(
       expect.anything(),
@@ -70,7 +81,7 @@ describe('Router Index', () => {
   it('routes an info alert to Discord', async () => {
     (retry.sendWithRetry as jest.Mock).mockResolvedValue(true);
     
-    await route({ ...baseAlert, final_severity: 'info' }, mockRedis);
+    await route({ ...baseIncident, severity: 'info' }, mockRedis);
     
     expect(retry.sendWithRetry).toHaveBeenCalledWith(
       expect.anything(),
@@ -85,7 +96,7 @@ describe('Router Index', () => {
   it('logs a fatal error if critical delivery fails', async () => {
     (retry.sendWithRetry as jest.Mock).mockResolvedValue(false);
     
-    await route({ ...baseAlert, final_severity: 'critical' }, mockRedis);
+    await route({ ...baseIncident, severity: 'critical' }, mockRedis);
     
     expect(logger.fatal).toHaveBeenCalledWith(
       expect.objectContaining({ channel: 'pagerduty', severity: 'critical', incidentId: 'fp1' }),
@@ -96,7 +107,7 @@ describe('Router Index', () => {
   it('does not log fatal error if non-critical delivery fails', async () => {
     (retry.sendWithRetry as jest.Mock).mockResolvedValue(false);
     
-    await route({ ...baseAlert, final_severity: 'warning' }, mockRedis);
+    await route({ ...baseIncident, severity: 'warning' }, mockRedis);
     
     expect(logger.fatal).not.toHaveBeenCalled();
   });

@@ -1,23 +1,20 @@
-import { Alert, BatchedGroup } from '../types/alert.types';
+import { Incident, BatchedGroup } from '../types/alert.types';
 
 /**
  * Type guard to check if the payload is a BatchedGroup
  */
-function isBatchedGroup(incidentOrBatch: Alert | BatchedGroup): incidentOrBatch is BatchedGroup {
+function isBatchedGroup(incidentOrBatch: Incident | BatchedGroup): incidentOrBatch is BatchedGroup {
   return 'incidents' in incidentOrBatch;
 }
 
 /**
  * Format notification payload as plain text
  */
-export function formatNotification(incidentOrBatch: Alert | BatchedGroup): string {
+export function formatNotification(incidentOrBatch: Incident | BatchedGroup): string {
   if (isBatchedGroup(incidentOrBatch)) {
-    const { id, severity, service, incidents, cooldown_suppressed_count, aiEnrichment } = incidentOrBatch;
+    const { id, severity, incidents, cooldown_suppressed_count, aiEnrichment } = incidentOrBatch;
     
-    let text = `[${severity.toUpperCase()}] Batched Alert Group: ${id}\n`;
-    if (service) {
-      text += `Service: ${service}\n`;
-    }
+    let text = `[${severity.toUpperCase()}] Batched Alert Group: ${id || 'no-id'}\n`;
     
     text += `Incidents in group: ${incidents.length}\n`;
     
@@ -31,15 +28,15 @@ export function formatNotification(incidentOrBatch: Alert | BatchedGroup): strin
     
     return text;
   } else {
-    // Individual alert
-    const alert = incidentOrBatch as Alert;
+    // Individual Incident
+    const incident = incidentOrBatch as Incident;
     
-    let text = `[${(alert.final_severity || alert.severity_score || 'UNKNOWN').toUpperCase()}] ${alert.alertname}\n`;
-    text += `Service: ${alert.service}\n`;
-    text += `Fingerprint: ${alert.fingerprint}\n`;
+    let text = `[${(incident.severity || 'UNKNOWN').toUpperCase()}] ${incident.summary}\n`;
+    text += `Service: ${incident.root_cause.service}\n`;
+    text += `Incident ID: ${incident.incident_id}\n`;
     
-    if (alert.aiEnrichment?.narrative) {
-      text += `\nAI Analysis:\n${alert.aiEnrichment.narrative}\n`;
+    if (incident.ai_narrative) {
+      text += `\nAI Analysis:\n${incident.ai_narrative}\n`;
     }
     
     return text;

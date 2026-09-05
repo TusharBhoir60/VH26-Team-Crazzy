@@ -64,9 +64,9 @@ describe('Batching Stage', () => {
       const batch = flushBatch();
       
       // Warning goes to Slack
-      // Info goes to Email-Discord
-      // Unknown goes to Slack
-      expect(batch).toHaveLength(3); // Warning(slack), Info(email-discord), Unknown(slack)
+      // Info goes to Discord
+      // Unknown goes to Discord
+      expect(batch).toHaveLength(3); // Warning(slack), Info(discord), Unknown(discord)
 
       const warningGroup = batch.find(b => b.severity === 'warning');
       expect(warningGroup?.incidents).toHaveLength(2);
@@ -74,7 +74,7 @@ describe('Batching Stage', () => {
 
       const infoGroup = batch.find(b => b.severity === 'info');
       expect(infoGroup?.incidents).toHaveLength(1);
-      expect(infoGroup?.destinationChannel).toBe('email-discord');
+      expect(infoGroup?.destinationChannel).toBe('discord');
 
       const unknownGroup = batch.find(b => b.severity === 'unknown');
       expect(unknownGroup?.incidents).toHaveLength(1);

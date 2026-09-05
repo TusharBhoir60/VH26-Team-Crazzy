@@ -151,10 +151,29 @@ describe('Adaptive Cooldown', () => {
     expect(finalResult.suppressedCount).toBe(1);
   });
 
-  it('throws an error if root cause fingerprint is missing', async () => {
+  it('fails open if root cause fingerprint is missing', async () => {
     const incident = createMockIncident('', 'low');
     incident.root_cause.fingerprint = ''; // Empty string
     
-    await expect(applyCooldown(incident)).rejects.toThrow('missing a root_cause fingerprint');
+    const result = await applyCooldown(incident);
+    expect(result.allowed).toBe(true);
+    expect(result.suppressedCount).toBe(0);
+  });
+
+  it('fails open if Redis throws an error', async () => {
+    const incident = createMockIncident('test-redis-fail', 'warning');
+    // Force the mock to throw for this specific key
+    const originalSet = mockStorage.set;
+    
+    // We can simulate an error by making checkAndApplyCooldown throw
+    // The easiest way is to mock applyCooldown's inner dependency or just the redis client
+    // Since redis is mocked globally above, we can temporarily make set throw
+    const ioredis = require('ioredis');
+    const mockSet = ioredis().set;
+    mockSet.mockRejectedValueOnce(new Error('Redis connection lost'));
+    
+    const result = await applyCooldown(incident);
+    expect(result.allowed).toBe(true);
+    expect(result.suppressedCount).toBe(0);
   });
 });
