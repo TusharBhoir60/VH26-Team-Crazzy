@@ -1,33 +1,39 @@
-services:
-  app:
-    build:
-      context: ./backend
-    ports:
-      - "8080:8080"
-    environment:
-      - NODE_ENV=development
-      - PORT=8080
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/alert_fatigue_buster
-    depends_on:
-      - redis
-      - db
+version: '3.8'
 
+services:
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=alert_fatigue_buster
-    ports:
-      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NODE_ENV=production
+    depends_on:
+      - redis
+    # Using env_file to load secrets
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
 
 volumes:
-  pgdata:
+  redis_data:
