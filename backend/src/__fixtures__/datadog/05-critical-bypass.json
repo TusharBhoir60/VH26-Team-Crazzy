@@ -1,0 +1,11 @@
+{
+  "title": "[Triggered] Payment Gateway Offline",
+  "body": "Description for [Triggered] Payment Gateway Offline",
+  "alert_type": "error",
+  "priority": "P1",
+  "alert_transition": "Triggered",
+  "tags": "env:production,service:payment-gateway,severity:critical",
+  "date": 1788557025,
+  "id": 6929613,
+  "hostname": "prod-server-01"
+}

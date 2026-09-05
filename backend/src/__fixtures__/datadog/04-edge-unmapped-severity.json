@@ -1,0 +1,11 @@
+{
+  "title": "[Triggered] Weird Alert",
+  "body": "Description for [Triggered] Weird Alert",
+  "alert_type": "error",
+  "priority": "P99",
+  "alert_transition": "Triggered",
+  "tags": "env:production,service:fruit-service,severity:banana",
+  "date": 1788557025,
+  "id": 9714890,
+  "hostname": "prod-server-01"
+}

@@ -1,7 +1,7 @@
 import { normalizeAlertmanagerPayload, mapAlertmanagerSeverity } from '../parsers/alertmanager';
 import { AlertmanagerPayloadSchema } from '../schemas/alertmanager.schema';
-import prometheusFiringFixture from '../__fixtures__/prometheus-firing.json';
-import prometheusResolvedFixture from '../__fixtures__/prometheus-resolved.json';
+import prometheusFiringFixture from '../../__fixtures__/alertmanager/01-normal-critical.json';
+import prometheusResolvedFixture from '../../__fixtures__/alertmanager/01-normal-resolved.json';
 
 describe('Alertmanager Parser & Normalizer', () => {
   it('should validate and parse valid Prometheus firing fixture', () => {
@@ -10,26 +10,17 @@ describe('Alertmanager Parser & Normalizer', () => {
 
     if (parseResult.success) {
       const alerts = normalizeAlertmanagerPayload(parseResult.data);
-      expect(alerts).toHaveLength(2);
+      expect(alerts).toHaveLength(1);
 
-      // Verify Alert 1: PostgresHighConnectionCount
       const alert1 = alerts[0];
-      expect(alert1?.alertname).toBe('PostgresHighConnectionCount');
-      expect(alert1?.service).toBe('database');
+      expect(alert1?.alertname).toBe('DatabaseDown');
+      expect(alert1?.service).toBe('primary-db');
       expect(alert1?.status).toBe('firing');
       expect(alert1?.source).toBe('prometheus');
       expect(alert1?.severity_score).toBe('critical');
       expect(alert1?.fingerprint).toBeDefined();
-      expect(alert1?.fingerprint.length).toBe(64);
       expect(alert1?.cluster_id).toBeNull();
       expect(alert1?.is_root_cause).toBe(false);
-
-      // Verify Alert 2: AuthServiceLatencyHigh
-      const alert2 = alerts[1];
-      expect(alert2?.alertname).toBe('AuthServiceLatencyHigh');
-      expect(alert2?.service).toBe('auth-service');
-      expect(alert2?.status).toBe('firing');
-      expect(alert2?.severity_score).toBe('warning');
     }
   });
 

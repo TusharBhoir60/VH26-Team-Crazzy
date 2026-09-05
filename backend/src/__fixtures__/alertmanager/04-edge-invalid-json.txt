@@ -1,0 +1,1 @@
+{ "receiver": "webhook", "status": "firing", "alerts": [ { "status": "fi

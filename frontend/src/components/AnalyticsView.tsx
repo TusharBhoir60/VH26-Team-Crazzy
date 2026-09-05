@@ -1,4 +1,19 @@
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+
 export function AnalyticsView() {
+  const noiseData = [
+    { name: 'Week 1', raw: 480, correlated: 24 },
+    { name: 'Week 2', raw: 520, correlated: 26 },
+    { name: 'Week 3', raw: 500, correlated: 27 },
+  ];
+
+  const serviceData = [
+    { name: 'Payment', incidents: 12, fill: '#f43f5e' },
+    { name: 'Checkout', incidents: 8, fill: '#f59e0b' },
+    { name: 'Database', incidents: 5, fill: '#6366f1' },
+    { name: 'Auth', incidents: 3, fill: '#94a3b8' },
+  ];
+
   return (
     <div className="space-y-6">
       {/* 4 Summary Stats */}
@@ -31,7 +46,7 @@ export function AnalyticsView() {
       {/* 2x2 Clean Analytics Chart Matrix */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart 1: Raw Alerts vs Correlated Incidents */}
-        <div className="clay-card p-6 space-y-4">
+        <div className="clay-card p-6 space-y-4 flex flex-col h-[320px]">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-[16px] font-bold text-on-surface">Noise Suppression Stream</h3>
@@ -42,53 +57,34 @@ export function AnalyticsView() {
             </span>
           </div>
 
-          <div className="space-y-4 pt-2">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="font-semibold text-slate-600">Week 1</span>
-                <span className="font-bold text-on-surface">480 raw → 24 correlated (95.0% reduced)</span>
-              </div>
-              <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                <div className="bg-[#5c67f5] h-full" style={{ width: '95%' }}></div>
-                <div className="bg-rose-400 h-full" style={{ width: '5%' }}></div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="font-semibold text-slate-600">Week 2</span>
-                <span className="font-bold text-on-surface">520 raw → 26 correlated (95.0% reduced)</span>
-              </div>
-              <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                <div className="bg-[#5c67f5] h-full" style={{ width: '95%' }}></div>
-                <div className="bg-rose-400 h-full" style={{ width: '5%' }}></div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="font-semibold text-slate-600">Week 3</span>
-                <span className="font-bold text-on-surface">500 raw → 27 correlated (94.6% reduced)</span>
-              </div>
-              <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                <div className="bg-[#5c67f5] h-full" style={{ width: '94.6%' }}></div>
-                <div className="bg-rose-400 h-full" style={{ width: '5.4%' }}></div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-6 pt-2 text-[12px]">
-              <span className="flex items-center gap-1.5 font-medium text-slate-600">
-                <span className="w-3 h-3 rounded-sm bg-[#5c67f5]"></span> Suppressed Noise
-              </span>
-              <span className="flex items-center gap-1.5 font-medium text-slate-600">
-                <span className="w-3 h-3 rounded-sm bg-rose-400"></span> Actionable Incidents
-              </span>
-            </div>
+          <div className="flex-1 w-full pt-4 -ml-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={noiseData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRaw" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#5c67f5" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#5c67f5" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorCorrelated" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#fb7185" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#fb7185" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} 
+                  labelStyle={{ fontWeight: 'bold', color: '#1e293b' }} 
+                />
+                <Area type="monotone" dataKey="raw" stroke="#5c67f5" strokeWidth={2} fillOpacity={1} fill="url(#colorRaw)" name="Suppressed Noise" />
+                <Area type="monotone" dataKey="correlated" stroke="#fb7185" strokeWidth={2} fillOpacity={1} fill="url(#colorCorrelated)" name="Actionable Incidents" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
         {/* Chart 2: Incident Frequency by Service */}
-        <div className="clay-card p-6 space-y-4">
+        <div className="clay-card p-6 space-y-4 flex flex-col h-[320px]">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-[16px] font-bold text-on-surface">Incident Distribution by Service</h3>
@@ -99,46 +95,22 @@ export function AnalyticsView() {
             </span>
           </div>
 
-          <div className="space-y-3.5 pt-2">
-            <div>
-              <div className="flex justify-between text-[13px] font-semibold text-on-surface mb-1">
-                <span>Payment Gateway</span>
-                <span className="text-rose-600 font-bold">42% (12 incidents)</span>
-              </div>
-              <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div className="bg-rose-500 h-full rounded-full" style={{ width: '42%' }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-[13px] font-semibold text-on-surface mb-1">
-                <span>Checkout API</span>
-                <span className="text-amber-600 font-bold">28% (8 incidents)</span>
-              </div>
-              <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div className="bg-amber-500 h-full rounded-full" style={{ width: '28%' }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-[13px] font-semibold text-on-surface mb-1">
-                <span>PostgreSQL Main DB</span>
-                <span className="text-indigo-600 font-bold">18% (5 incidents)</span>
-              </div>
-              <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div className="bg-indigo-500 h-full rounded-full" style={{ width: '18%' }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-[13px] font-semibold text-on-surface mb-1">
-                <span>Auth Gateway & Others</span>
-                <span className="text-slate-600 font-bold">12% (3 incidents)</span>
-              </div>
-              <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div className="bg-slate-400 h-full rounded-full" style={{ width: '12%' }}></div>
-              </div>
-            </div>
+          <div className="flex-1 w-full pt-4 -ml-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={serviceData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+                <Tooltip 
+                  cursor={{ fill: '#f1f5f9' }} 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} 
+                />
+                <Bar dataKey="incidents" radius={[4, 4, 0, 0]} barSize={40}>
+                  {serviceData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
