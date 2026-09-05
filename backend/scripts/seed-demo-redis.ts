@@ -128,6 +128,8 @@ async function seedRecentAlerts() {
   console.log('  → Seeding recent alerts feed...');
 
   const recentAlerts = [
+    { alertname: 'Flapping Cache Node', service: 'redis-cache-1', severity: 'medium', status: 'flapping', source: 'prometheus', received_at: minutesAgo(1) },
+    { alertname: 'Resolved Deployment Failure', service: 'frontend-app', severity: 'high', status: 'resolved', source: 'datadog', received_at: minutesAgo(2) },
     { alertname: 'PaymentGateway500Error', service: 'payment-service', severity: 'critical', status: 'firing', source: 'prometheus', received_at: minutesAgo(2) },
     { alertname: 'CheckoutCartTimeout', service: 'checkout-api', severity: 'high', status: 'firing', source: 'prometheus', received_at: minutesAgo(3) },
     { alertname: 'PaymentLatencyP99High', service: 'payment-service', severity: 'high', status: 'firing', source: 'datadog', received_at: minutesAgo(5) },
@@ -151,15 +153,18 @@ async function seedRecentAlerts() {
   ];
 
   // Clear old entries
-  await redis.del('recent_alerts');
+  await redis.del('recent_alerts_index');
+  await redis.del('recent_alerts_data');
 
   for (const alert of recentAlerts) {
+    const fingerprint = `seed-${alert.alertname}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const entry = {
-      fingerprint: `seed-${alert.alertname}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      fingerprint,
       ...alert,
     };
     const score = new Date(alert.received_at).getTime();
-    await redis.zadd('recent_alerts', score.toString(), JSON.stringify(entry));
+    await redis.zadd('recent_alerts_index', score.toString(), fingerprint);
+    await redis.hset('recent_alerts_data', fingerprint, JSON.stringify(entry));
   }
 }
 

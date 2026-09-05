@@ -3,14 +3,17 @@ import { Incident, BatchedGroup } from '../../types/alert.types';
 import { ChannelAdapter, DeliveryResult } from '../types';
 
 export class SlackAdapter implements ChannelAdapter {
-  private webhookUrl: string;
+  private configuredUrl?: string;
 
   constructor(webhookUrl?: string) {
-    this.webhookUrl = webhookUrl || process.env.SLACK_WEBHOOK_URL || '';
+    this.configuredUrl = webhookUrl;
   }
 
   async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
-    if (!this.webhookUrl) {
+    // Read env lazily so dotenv.config() has time to load
+    const webhookUrl = this.configuredUrl || process.env.SLACK_WEBHOOK_URL || '';
+
+    if (!webhookUrl) {
       if (process.env.NODE_ENV === 'development') {
         console.log('[MOCK] Slack delivery successful (No webhook URL configured)');
         return { success: true };
@@ -20,7 +23,7 @@ export class SlackAdapter implements ChannelAdapter {
 
     try {
       const response = await axios.post(
-        this.webhookUrl,
+        webhookUrl,
         {
           text: content
         },

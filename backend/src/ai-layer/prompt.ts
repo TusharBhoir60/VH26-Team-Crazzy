@@ -47,3 +47,34 @@ CONSTRAINTS:
 
 JSON response:`;
 }
+
+/**
+ * Builds a prompt for analyzing the health of a single service based on active alerts.
+ */
+export function buildServiceHealthPrompt(serviceName: string, activeAlerts: any[]): string {
+  const alertsStr = activeAlerts.map(a => 
+    `- ${a.alertname} (severity: ${a.severity || 'unknown'}, status: ${a.status || 'unknown'})`
+  ).join('\n');
+
+  return `You are an expert SRE analyzing the real-time health of a specific microservice based on its currently active telemetry alerts.
+
+SERVICE: ${serviceName}
+ACTIVE ALERTS (${activeAlerts.length}):
+${alertsStr || '  (none)'}
+
+TASK:
+Analyze the health of this service based on the alerts above. Determine the root cause if possible, and provide a short summary suitable for an on-call engineer.
+Respond with a JSON object in exactly this format:
+{
+  "rootCauseSuggestion": "<string: what is likely failing inside or around this service>",
+  "suggestedSeverity": "<one of: critical, high, medium, low>",
+  "narrative": "<string: 2-4 sentence human-readable summary of the service health>"
+}
+
+CONSTRAINTS:
+- suggestedSeverity must be one of: critical, high, medium, low
+- narrative should be actionable and concise
+- Respond ONLY with the JSON object, no additional text, no markdown code fences
+
+JSON response:`;
+}

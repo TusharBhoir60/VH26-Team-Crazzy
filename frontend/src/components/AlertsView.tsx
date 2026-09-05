@@ -21,27 +21,35 @@ function timeAgo(isoStr: string): string {
 }
 
 export function AlertsView() {
-  const [filter, setFilter] = useState<'All' | 'Firing' | 'Resolved'>('All');
+  const [filter, setFilter] = useState<'All' | 'Firing' | 'Flapping' | 'Resolved'>('All');
   const [alerts, setAlerts] = useState<RecentAlert[]>([]);
   const [stats, setStats] = useState<{ raw_alert_count: number; notifications_sent: number; reduction_percent: number } | null>(null);
 
   useEffect(() => {
-    fetch('/api/v1/dashboard/recent-alerts')
-      .then(res => res.json())
-      .then(data => setAlerts(Array.isArray(data) ? data : []))
-      .catch(err => console.error('Error fetching recent alerts:', err));
+    const fetchData = () => {
+      fetch('/api/v1/dashboard/recent-alerts')
+        .then(res => res.json())
+        .then(data => setAlerts(Array.isArray(data) ? data : []))
+        .catch(err => console.error('Error fetching recent alerts:', err));
 
-    fetch('/api/v1/dashboard/stats')
-      .then(res => res.json())
-      .then(setStats)
-      .catch(err => console.error('Error fetching stats:', err));
+      fetch('/api/v1/dashboard/stats')
+        .then(res => res.json())
+        .then(setStats)
+        .catch(err => console.error('Error fetching stats:', err));
+    };
+
+    fetchData(); // Initial fetch
+    const intervalId = setInterval(fetchData, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const firingAlerts = alerts.filter(a => a.status === 'firing');
+  const flappingAlerts = alerts.filter(a => a.status === 'flapping');
   const resolvedAlerts = alerts.filter(a => a.status === 'resolved');
 
   const filteredAlerts = alerts.filter((a) => {
     if (filter === 'Firing') return a.status === 'firing';
+    if (filter === 'Flapping') return a.status === 'flapping';
     if (filter === 'Resolved') return a.status === 'resolved';
     return true;
   });
@@ -104,8 +112,8 @@ export function AlertsView() {
       {/* Control Bar & Filter Tabs */}
       <div className="p-4 clay-card flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          {(['All', 'Firing', 'Resolved'] as const).map((tab) => {
-            const count = tab === 'All' ? alerts.length : tab === 'Firing' ? firingAlerts.length : resolvedAlerts.length;
+          {(['All', 'Firing', 'Flapping', 'Resolved'] as const).map((tab) => {
+            const count = tab === 'All' ? alerts.length : tab === 'Firing' ? firingAlerts.length : tab === 'Flapping' ? flappingAlerts.length : resolvedAlerts.length;
             return (
               <button
                 key={tab}
@@ -142,10 +150,14 @@ export function AlertsView() {
               >
                 <div className="flex items-start gap-3.5">
                   <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
-                    item.status === 'firing' ? 'bg-rose-50 border border-rose-100 text-rose-500' : 'bg-emerald-50 border border-emerald-100 text-emerald-500'
+                    item.status === 'firing' ? 'bg-rose-50 border border-rose-100 text-rose-500' :
+                    item.status === 'flapping' ? 'bg-amber-50 border border-amber-100 text-amber-500' :
+                    'bg-emerald-50 border border-emerald-100 text-emerald-500'
                   }`}>
                     <span className="material-symbols-outlined text-[20px]">
-                      {item.status === 'firing' ? 'notifications_active' : 'check_circle'}
+                      {item.status === 'firing' ? 'notifications_active' :
+                       item.status === 'flapping' ? 'warning' :
+                       'check_circle'}
                     </span>
                   </div>
 
@@ -171,9 +183,13 @@ export function AlertsView() {
                   </span>
 
                   <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                    item.status === 'firing' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'
+                    item.status === 'firing' ? 'bg-rose-100 text-rose-600' :
+                    item.status === 'flapping' ? 'bg-amber-100 text-amber-600' :
+                    'bg-emerald-100 text-emerald-600'
                   }`}>
-                    {item.status === 'firing' ? '🔴 Firing' : '✅ Resolved'}
+                    {item.status === 'firing' ? '🔴 Firing' :
+                     item.status === 'flapping' ? '⚠️ Flapping' :
+                     '✅ Resolved'}
                   </span>
                 </div>
               </div>

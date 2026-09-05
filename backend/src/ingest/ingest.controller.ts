@@ -35,21 +35,6 @@ export async function handleAlertmanagerWebhook(req: Request, res: Response): Pr
       const sev = (alert.severity_score || 'low').toLowerCase();
       redis.incr(`stats:severity:${sev}`).catch(() => {});
 
-      // Recent alerts — push compact summary into sorted set
-      const summary = JSON.stringify({
-        fingerprint: alert.fingerprint,
-        alertname: alert.alertname,
-        service: alert.service,
-        severity: alert.severity_score || 'unknown',
-        status: alert.status,
-        source: alert.source,
-        received_at: alert.received_at || new Date().toISOString(),
-      });
-      const score = Date.now();
-      redis.zadd('recent_alerts', score.toString(), summary).catch(() => {});
-      // Trim to keep only the most recent entries
-      redis.zremrangebyrank('recent_alerts', 0, -(MAX_RECENT_ALERTS + 1)).catch(() => {});
-
       handleNormalizedAlert(alert).catch((err) => {
         logger.error({ err, fingerprint: alert.fingerprint }, 'Failed during downstream handoff');
       });
@@ -106,20 +91,6 @@ export async function handleDatadogWebhook(req: Request, res: Response): Promise
       // Telemetry — per-severity counters
       const sev = (alert.severity_score || 'low').toLowerCase();
       redis.incr(`stats:severity:${sev}`).catch(() => {});
-
-      // Recent alerts — push compact summary into sorted set
-      const summary = JSON.stringify({
-        fingerprint: alert.fingerprint,
-        alertname: alert.alertname,
-        service: alert.service,
-        severity: alert.severity_score || 'unknown',
-        status: alert.status,
-        source: alert.source,
-        received_at: alert.received_at || new Date().toISOString(),
-      });
-      const score = Date.now();
-      redis.zadd('recent_alerts', score.toString(), summary).catch(() => {});
-      redis.zremrangebyrank('recent_alerts', 0, -(MAX_RECENT_ALERTS + 1)).catch(() => {});
 
       handleNormalizedAlert(alert).catch((err) => {
         logger.error({ err, fingerprint: alert.fingerprint }, 'Failed during downstream handoff');

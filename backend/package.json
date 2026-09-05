@@ -8,7 +8,8 @@
     "test:load": "tsx ../docs/testing/alert-generator.ts",
     "build": "tsc",
     "start": "tsx src/server.ts",
-    "seed": "tsx scripts/seed-demo-redis.ts"
+    "seed": "tsx scripts/seed-demo-redis.ts",
+    "simulate": "tsx scripts/simulate-traffic.ts"
   },
   "keywords": [],
   "author": "",

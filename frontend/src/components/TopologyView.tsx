@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 interface ServiceDef {
   depends_on: string[];
   tier: string;
+  status?: string;
+  active_alerts?: number;
 }
 
 interface TopologyData {
@@ -115,25 +117,52 @@ export function TopologyView() {
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-4">
                   {tiers[tier]!.map((svcId) => {
-                    const colors = TIER_COLORS[tier] || TIER_COLORS['low'];
+                    const svcDef = services[svcId];
                     const isSelected = svcId === currentNode;
+                    
+                    // Determine colors based on live status instead of just tier
+                    let borderColor = TIER_COLORS[tier]?.border || 'border-slate-200';
+                    let bgColor = TIER_COLORS[tier]?.bg || 'bg-white';
+                    let textColor = TIER_COLORS[tier]?.text || 'text-slate-600';
+                    let isPulsing = false;
+                    
+                    if (svcDef.status === 'Critical') {
+                      borderColor = 'border-rose-500';
+                      bgColor = 'bg-rose-50/90';
+                      textColor = 'text-rose-700';
+                      isPulsing = true;
+                    } else if (svcDef.status === 'Degraded') {
+                      borderColor = 'border-amber-400';
+                      bgColor = 'bg-amber-50/60';
+                      textColor = 'text-amber-700';
+                    } else if (svcDef.status === 'Healthy') {
+                      borderColor = 'border-emerald-300';
+                      bgColor = 'bg-emerald-50/50';
+                      textColor = 'text-emerald-700';
+                    }
+
                     return (
                       <button
                         key={svcId}
                         type="button"
                         onClick={() => setSelectedNode(svcId)}
-                        className={`p-4 rounded-2xl border-2 transition-all flex items-center gap-3 ${
+                        className={`relative p-4 rounded-2xl border-2 transition-all flex items-center gap-3 ${
                           isSelected
                             ? 'border-[#5c67f5] bg-indigo-50/90 shadow-md scale-105'
-                            : `${colors.border} ${colors.bg} hover:shadow-sm`
+                            : `${borderColor} ${bgColor} hover:shadow-sm`
                         }`}
                       >
-                        <span className={`material-symbols-outlined ${isSelected ? 'text-[#5c67f5]' : colors.text} text-[22px]`}>
+                        {svcDef.active_alerts ? (
+                          <span className={`absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ${isPulsing ? 'animate-pulse' : ''}`}>
+                            {svcDef.active_alerts}
+                          </span>
+                        ) : null}
+                        <span className={`material-symbols-outlined ${isSelected ? 'text-[#5c67f5]' : textColor} text-[22px]`}>
                           {SERVICE_ICONS[svcId] || 'dns'}
                         </span>
                         <div className="text-left">
                           <div className="text-[13px] font-bold text-on-surface">{formatServiceName(svcId)}</div>
-                          <div className={`text-[10px] font-semibold ${colors.text}`}>
+                          <div className={`text-[10px] font-semibold ${textColor}`}>
                             {tier.charAt(0).toUpperCase() + tier.slice(1)} • {services[svcId].depends_on.length} deps
                           </div>
                         </div>
@@ -165,6 +194,20 @@ export function TopologyView() {
           <div className="space-y-2">
             <h3 className="text-[20px] font-extrabold text-on-surface">{formatServiceName(currentNode)}</h3>
             <p className="text-[13px] text-slate-500 font-medium">ID: <code>{currentNode}</code></p>
+            {currentDef.status && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                  currentDef.status === 'Critical' ? 'bg-rose-100 text-rose-700' :
+                  currentDef.status === 'Degraded' ? 'bg-amber-100 text-amber-700' :
+                  'bg-emerald-100 text-emerald-700'
+                }`}>
+                  {currentDef.status}
+                </span>
+                <span className="text-[12px] font-semibold text-slate-500">
+                  {currentDef.active_alerts || 0} active alert{(currentDef.active_alerts !== 1) ? 's' : ''}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-1.5">

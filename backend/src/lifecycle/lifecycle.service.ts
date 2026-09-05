@@ -50,6 +50,22 @@ export async function trackLifecycle(
       lastTransitionAt: nextHistory.lastTransitionAt,
     });
 
+    // Update the recent alerts feed with the enriched alert
+    const summary = JSON.stringify({
+      fingerprint: alert.fingerprint,
+      alertname: alert.alertname,
+      service: alert.service,
+      severity: alert.severity_score || 'unknown',
+      status: nextHistory.state, // The true lifecycle state
+      source: alert.source,
+      received_at: alert.received_at || new Date().toISOString(),
+    });
+    
+    multi.hset('recent_alerts_data', alert.fingerprint, summary);
+    multi.zadd('recent_alerts_index', Date.now().toString(), alert.fingerprint);
+    // Keep only the most recent 50 alerts in the index
+    multi.zremrangebyrank('recent_alerts_index', 0, -51);
+
     // Set TTL based on whether it is fully resolved or not
     if (nextHistory.state === 'resolved') {
       multi.expire(key, RESOLVED_TTL_SECONDS);

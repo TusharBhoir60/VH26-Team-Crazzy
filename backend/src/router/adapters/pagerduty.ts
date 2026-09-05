@@ -3,15 +3,18 @@ import { Incident, BatchedGroup } from '../../types/alert.types';
 import { ChannelAdapter, DeliveryResult } from '../types';
 
 export class PagerDutyAdapter implements ChannelAdapter {
-  private routingKey: string;
+  private configuredKey?: string;
   private endpoint = 'https://events.pagerduty.com/v2/enqueue';
 
   constructor(routingKey?: string) {
-    this.routingKey = routingKey || process.env.PAGERDUTY_ROUTING_KEY || '';
+    this.configuredKey = routingKey;
   }
 
   async send(content: string, incident: Incident | BatchedGroup): Promise<DeliveryResult> {
-    if (!this.routingKey) {
+    // Read env lazily so dotenv.config() has time to load
+    const routingKey = this.configuredKey || process.env.PAGERDUTY_ROUTING_KEY || '';
+
+    if (!routingKey) {
       if (process.env.NODE_ENV === 'development') {
         console.log('[MOCK] PagerDuty delivery successful (No routing key configured)');
         return { success: true, messageId: 'mock-pd-123' };
@@ -23,7 +26,7 @@ export class PagerDutyAdapter implements ChannelAdapter {
       const response = await axios.post(
         this.endpoint,
         {
-          routing_key: this.routingKey,
+          routing_key: routingKey,
           event_action: 'trigger',
           payload: {
             summary: content,

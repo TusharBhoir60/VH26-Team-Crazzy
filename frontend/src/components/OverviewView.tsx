@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-
+import { AnalyticsView } from './AnalyticsView';
+import { TopologyView } from './TopologyView';
 interface DashboardStats {
   raw_alert_count: number;
   notifications_sent: number;
@@ -229,6 +230,17 @@ export function OverviewView() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Topology Graph */}
+      <div className="pt-6">
+        <TopologyView />
+      </div>
+
+      {/* Analytics Section */}
+      <div className="pt-6 border-t border-slate-100">
+        <h2 className="text-[20px] font-extrabold text-on-surface mb-6 px-1">Advanced Analytics</h2>
+        <AnalyticsView />
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ interface Incident {
   started_at: string;
   affected_services: string[];
   root_cause_alertname?: string;
+  root_cause_confidence?: string;
+  ai_narrative?: string | null;
   alerts?: Array<{ fingerprint: string; alertname: string; service: string; severity_score: string }>;
 }
 
@@ -278,10 +280,35 @@ export function IncidentsView() {
             <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-2">
               <span className="text-[11px] font-bold text-[#5c67f5] uppercase tracking-wider">AI Root Cause Analysis</span>
               <p className="text-[13px] text-on-surface leading-relaxed">
-                Detected abnormal behavior on <code>{selectedIncident.root_cause_service}</code> triggering cascade
-                across {selectedIncident.affected_services.length} service(s). Root cause alert: <code>{selectedIncident.root_cause_alertname}</code>.
+                {selectedIncident.ai_narrative 
+                  ? selectedIncident.ai_narrative 
+                  : <>Detected abnormal behavior on <code>{selectedIncident.root_cause_service}</code> triggering cascade across {selectedIncident.affected_services.length} service(s). Root cause alert: <code>{selectedIncident.root_cause_alertname}</code> (Confidence: <span className="capitalize">{selectedIncident.root_cause_confidence || 'High'}</span>).</>}
               </p>
             </div>
+
+            {selectedIncident.alerts && selectedIncident.alerts.length > 0 && (
+              <div className="pt-2">
+                <h3 className="text-[13px] font-bold text-on-surface mb-3">Underlying Alerts ({selectedIncident.alerts.length})</h3>
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                  {selectedIncident.alerts.map((alert, idx) => (
+                    <div key={idx} className="p-3 rounded-xl border border-slate-100 bg-white flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2 h-2 rounded-full ${
+                          alert.severity_score === 'critical' ? 'bg-rose-500' :
+                          alert.severity_score === 'high' ? 'bg-amber-500' :
+                          alert.severity_score === 'medium' ? 'bg-yellow-500' : 'bg-sky-500'
+                        }`}></span>
+                        <div>
+                          <div className="text-[13px] font-bold text-on-surface">{alert.alertname}</div>
+                          <div className="text-[11px] text-slate-500 font-mono mt-0.5">{alert.service}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{alert.severity_score}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button

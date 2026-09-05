@@ -10,8 +10,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navItems = [
     { id: 'overview', label: 'Overview', icon: 'dashboard' },
-    { id: 'incidents', label: 'Incidents', icon: 'confirmation_number', badge: '3' },
-    { id: 'alerts', label: 'Alerts', icon: 'notifications', badge: '27' },
+    { id: 'incidents', label: 'Incidents', icon: 'confirmation_number' },
+    { id: 'alerts', label: 'Alerts', icon: 'notifications' },
     { id: 'services', label: 'Services', icon: 'hub' },
     { id: 'topology', label: 'Topology', icon: 'account_tree' },
     { id: 'analytics', label: 'Analytics', icon: 'bar_chart' },
@@ -29,7 +29,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
-                <span className="font-bold text-[17px] leading-tight text-on-surface tracking-tight">Sentry</span>
+                <span className="font-bold text-[17px] leading-tight text-on-surface tracking-tight">MAYDAY</span>
                 <span className="material-symbols-outlined text-[16px] text-on-surface-variant/70">expand_more</span>
               </div>
               <span className="text-[11px] text-on-surface-variant font-medium">Alert Fatigue Buster</span>

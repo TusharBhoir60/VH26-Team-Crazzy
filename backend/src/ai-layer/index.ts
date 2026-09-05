@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { logger } from '../shared/logger';
 import { AiEnrichmentResult } from './types';
 import { Incident } from '../types/alert.types';
-import { buildIncidentPrompt } from './prompt';
+import { buildIncidentPrompt, buildServiceHealthPrompt } from './prompt';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GROQ_MODEL = 'groq/compound-mini';
 
 /**
  * Zod schema for validating the AI's JSON response before trusting any field.
@@ -13,7 +13,7 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile';
  */
 const AiEnrichmentResultSchema = z.object({
   rootCauseSuggestion: z.string().min(1),
-  suggestedSeverity: z.enum(['critical', 'warning', 'info', 'unknown']),
+  suggestedSeverity: z.enum(['critical', 'high', 'medium', 'low', 'warning', 'info', 'unknown']),
   narrative: z.string().min(1),
 });
 
@@ -146,5 +146,84 @@ export async function getAiEnrichment(
   }
 }
 
+export async function getServiceHealthReasoning(
+  serviceName: string,
+  activeAlerts: any[],
+  timeoutMs: number = 5000
+): Promise<AiEnrichmentResult | null> {
+  const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    logger.warn({ serviceName }, 'ai-layer: GROQ_API_KEY not set — skipping AI enrichment');
+    return null;
+  }
+
+  const controller = new AbortController();
+  const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const prompt = buildServiceHealthPrompt(serviceName, activeAlerts);
+
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 512,
+        response_format: { type: 'json_object' },
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutHandle);
+
+    if (!response.ok) {
+      const text = await response.text();
+      logger.error({ status: response.status, text }, 'Groq API request failed');
+      return null;
+    }
+
+    const rawBody = await response.json() as Record<string, unknown>;
+    const rawContent = (rawBody?.choices as Array<Record<string, unknown>>)?.[0]?.message as Record<string, unknown>;
+    const contentStr = rawContent?.content as string | undefined;
+
+    if (!contentStr) {
+      logger.error('Groq API response missing content');
+      return null;
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(contentStr);
+    } catch {
+      logger.error({ contentStr }, 'Failed to parse Groq response as JSON');
+      return null;
+    }
+
+    const result = AiEnrichmentResultSchema.safeParse(parsed);
+    if (!result.success) {
+      logger.error({ errors: result.error.errors, parsed }, 'Groq response failed schema validation');
+      return null;
+    }
+
+    return result.data;
+  } catch (err) {
+    logger.error({ err }, 'Error in getServiceHealthReasoning');
+    clearTimeout(timeoutHandle);
+    return null;
+  }
+}
+
 export * from './types';
 export * from './prompt';
+
