@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+
 interface ServiceItem {
   id: string;
   name: string;
@@ -10,115 +12,155 @@ interface ServiceItem {
 }
 
 export function ServicesView() {
-  const services: ServiceItem[] = [
-    {
-      id: 'srv-01',
-      name: 'Payment Gateway API',
-      category: 'Financial Core',
-      status: 'Critical',
-      latency: '1,240 ms',
-      errorRate: '8.4%',
-      uptime: '98.12%',
-      alerts: 2
-    },
-    {
-      id: 'srv-02',
-      name: 'Checkout & Cart Engine',
-      category: 'E-commerce Storefront',
-      status: 'Degraded',
-      latency: '320 ms',
-      errorRate: '1.2%',
-      uptime: '99.45%',
-      alerts: 1
-    },
-    {
-      id: 'srv-03',
-      name: 'User Authentication Gateway',
-      category: 'Security & Identity',
-      status: 'Healthy',
-      latency: '24 ms',
-      errorRate: '0.01%',
-      uptime: '99.99%',
-      alerts: 0
-    },
-    {
-      id: 'srv-04',
-      name: 'PostgreSQL Production Cluster',
-      category: 'Database Infrastructure',
-      status: 'Healthy',
-      latency: '12 ms',
-      errorRate: '0.00%',
-      uptime: '99.98%',
-      alerts: 0
-    },
-    {
-      id: 'srv-05',
-      name: 'Redis Cache Layer',
-      category: 'In-Memory Cache',
-      status: 'Healthy',
-      latency: '2 ms',
-      errorRate: '0.00%',
-      uptime: '99.99%',
-      alerts: 0
-    },
-    {
-      id: 'srv-06',
-      name: 'Inventory & Stock Sync',
-      category: 'Supply Chain API',
-      status: 'Healthy',
-      latency: '38 ms',
-      errorRate: '0.02%',
-      uptime: '99.95%',
-      alerts: 0
-    },
-    {
-      id: 'srv-07',
-      name: 'Recommendation Engine',
-      category: 'ML Services',
-      status: 'Healthy',
-      latency: '62 ms',
-      errorRate: '0.05%',
-      uptime: '99.90%',
-      alerts: 0
-    },
-    {
-      id: 'srv-08',
-      name: 'Notification & Email Dispatcher',
-      category: 'Messaging',
-      status: 'Healthy',
-      latency: '15 ms',
-      errorRate: '0.00%',
-      uptime: '99.99%',
-      alerts: 0
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // AI Analysis Modal State
+  const [analyzingServiceId, setAnalyzingServiceId] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<{
+    serviceName: string;
+    rootCauseSuggestion: string;
+    suggestedSeverity: string;
+    narrative: string;
+  } | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchServices = async () => {
+      try {
+        const res = await fetch('/api/v1/dashboard/services');
+        if (!res.ok) throw new Error('Failed to fetch services');
+        const data = await res.json();
+        if (mounted) {
+          setServices(data);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error fetching services:', err);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchServices();
+    const interval = setInterval(fetchServices, 5000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleAIAnalysis = async (service: ServiceItem) => {
+    setAnalyzingServiceId(service.id);
+    setAnalysisError(null);
+    setAnalysisResult(null);
+    
+    try {
+      const res = await fetch(`/api/v1/dashboard/services/${service.id}/reasoning`);
+      if (!res.ok) throw new Error('Failed to fetch AI analysis');
+      const data = await res.json();
+      setAnalysisResult({
+        serviceName: service.name,
+        ...data
+      });
+    } catch (err) {
+      setAnalysisError('The AI reasoning service is temporarily unavailable.');
+    } finally {
+      setAnalyzingServiceId(null);
     }
-  ];
+  };
+
+  const totalServices = services.length;
+  const healthyCount = services.filter((s) => s.status === 'Healthy').length;
+  const degradedCount = services.filter((s) => s.status === 'Degraded').length;
+  const criticalCount = services.filter((s) => s.status === 'Critical').length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* AI Analysis Modal */}
+      {(analysisResult || analysisError || analyzingServiceId) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-lg w-full relative animate-in fade-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => { setAnalysisResult(null); setAnalysisError(null); }}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+            
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[20px]">smart_toy</span>
+              </div>
+              <div>
+                <h3 className="text-[18px] font-extrabold text-slate-900">AI Health Analysis</h3>
+                <p className="text-[13px] text-slate-500 font-medium">Powered by Groq & Llama 3</p>
+              </div>
+            </div>
+
+            {analyzingServiceId ? (
+              <div className="py-8 text-center space-y-3">
+                <div className="w-8 h-8 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
+                <p className="text-[14px] text-slate-600 font-medium animate-pulse">Analyzing real-time telemetry...</p>
+              </div>
+            ) : analysisError ? (
+              <div className="p-4 bg-rose-50 text-rose-700 rounded-2xl text-[13px] font-semibold border border-rose-100 flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">error</span>
+                {analysisError}
+              </div>
+            ) : analysisResult ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <span className="text-[13px] font-bold text-slate-500">Service</span>
+                  <span className="text-[14px] font-bold text-slate-900">{analysisResult.serviceName}</span>
+                </div>
+                
+                <div>
+                  <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Current Status</span>
+                  <p className="text-[14px] text-slate-700 leading-relaxed font-medium bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    {analysisResult.narrative}
+                  </p>
+                </div>
+                
+                <div>
+                  <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Root Cause Estimate</span>
+                  <p className="text-[14px] text-slate-700 leading-relaxed font-medium bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/50">
+                    {analysisResult.rootCauseSuggestion}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
+
       {/* 4 Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="p-5 clay-card">
           <span className="text-[13px] font-semibold text-on-surface-variant">Monitored Services</span>
-          <div className="text-[32px] font-extrabold text-on-surface mt-2 leading-none">8</div>
+          <div className="text-[32px] font-extrabold text-on-surface mt-2 leading-none">{loading ? '-' : totalServices}</div>
           <span className="text-[12px] text-slate-500 mt-1 block">Full stack telemetry</span>
         </div>
 
         <div className="p-5 clay-card">
           <span className="text-[13px] font-semibold text-on-surface-variant">Healthy Services</span>
-          <div className="text-[32px] font-extrabold text-emerald-600 mt-2 leading-none">6</div>
-          <span className="text-[12px] text-emerald-700 font-semibold mt-1 block">99.99% system uptime</span>
+          <div className="text-[32px] font-extrabold text-emerald-600 mt-2 leading-none">{loading ? '-' : healthyCount}</div>
+          <span className="text-[12px] text-emerald-700 font-semibold mt-1 block">Operational systems</span>
         </div>
 
         <div className="p-5 clay-card">
           <span className="text-[13px] font-semibold text-on-surface-variant">Degraded</span>
-          <div className="text-[32px] font-extrabold text-amber-600 mt-2 leading-none">1</div>
-          <span className="text-[12px] text-amber-700 font-semibold mt-1 block">Checkout API (+200ms)</span>
+          <div className="text-[32px] font-extrabold text-amber-600 mt-2 leading-none">{loading ? '-' : degradedCount}</div>
+          <span className="text-[12px] text-amber-700 font-semibold mt-1 block">Performance anomalies</span>
         </div>
 
         <div className="p-5 clay-card">
           <span className="text-[13px] font-semibold text-on-surface-variant">Critical Incidents</span>
-          <div className="text-[32px] font-extrabold text-rose-600 mt-2 leading-none">1</div>
-          <span className="text-[12px] text-rose-700 font-semibold mt-1 block">Payment Gateway</span>
+          <div className="text-[32px] font-extrabold text-rose-600 mt-2 leading-none">{loading ? '-' : criticalCount}</div>
+          <span className="text-[12px] text-rose-700 font-semibold mt-1 block">Active outages</span>
         </div>
       </div>
 
@@ -160,13 +202,13 @@ export function ServicesView() {
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold uppercase">Error Rate</span>
-                  <div className={`text-[13px] font-bold mt-0.5 ${srv.errorRate === '0.00%' ? 'text-slate-700' : 'text-rose-600'}`}>
+                  <div className={`text-[13px] font-bold mt-0.5 ${srv.errorRate === '0.00%' || srv.errorRate === '0.01%' ? 'text-slate-700' : 'text-rose-600'}`}>
                     {srv.errorRate}
                   </div>
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold uppercase">Uptime</span>
-                  <div className="text-[13px] font-bold text-emerald-600 mt-0.5">{srv.uptime}</div>
+                  <div className={`text-[13px] font-bold mt-0.5 ${srv.uptime.startsWith('99') ? 'text-emerald-600' : 'text-amber-600'}`}>{srv.uptime}</div>
                 </div>
               </div>
 
@@ -174,7 +216,7 @@ export function ServicesView() {
                 <span className="text-[12px] text-on-surface-variant font-medium">
                   {srv.alerts > 0 ? (
                     <span className="text-rose-600 font-bold flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[15px]">warning</span> {srv.alerts} active alert
+                      <span className="material-symbols-outlined text-[15px]">warning</span> {srv.alerts} active alert{srv.alerts !== 1 ? 's' : ''}
                     </span>
                   ) : (
                     <span className="text-emerald-600 font-medium flex items-center gap-1">
@@ -184,15 +226,25 @@ export function ServicesView() {
                 </span>
 
                 <button 
-                  type="button" 
-                  onClick={() => alert(`Opening metrics for ${srv.name}`)}
-                  className="px-3 py-1.5 rounded-full clay-button text-[12px] font-semibold text-on-surface hover:bg-slate-100"
+                  onClick={() => handleAIAnalysis(srv)}
+                  disabled={analyzingServiceId === srv.id}
+                  className="px-3 py-1.5 rounded-full clay-button text-[12px] font-semibold text-on-surface hover:bg-slate-100 cursor-pointer disabled:opacity-50 flex items-center gap-1"
                 >
-                  Telemetry
+                  {analyzingServiceId === srv.id ? (
+                    <span className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+                  )}
+                  AI Analysis
                 </button>
               </div>
             </div>
           ))}
+          {!loading && services.length === 0 && (
+            <div className="col-span-full py-12 text-center text-slate-500 text-[14px]">
+              No monitored services found.
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -18,11 +18,7 @@ export function Header({ title }: HeaderProps) {
       </div>
       
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-4 py-2 clay-pill cursor-pointer hover:bg-slate-50/80 transition-all text-on-surface font-semibold text-[13px]">
-          <span className="material-symbols-outlined text-[17px] text-slate-400">calendar_today</span>
-          <span>May 06 – Jun 05, 2024</span>
-          <span className="material-symbols-outlined text-[17px] text-slate-400">expand_more</span>
-        </div>
+        {/* Calendar option removed as requested */}
       </div>
     </header>
   );
